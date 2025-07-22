@@ -1,6 +1,6 @@
 import casadi as ca
 
-def SauthoffCoefficients(numCoaches, mass, g=9.81):
+def Sauthoff_coefficients(numCoaches, mass, g=9.81):
     # input: velocity in km/h, mass in kg
     # output: force in kN
 
@@ -18,9 +18,9 @@ def SauthoffCoefficients(numCoaches, mass, g=9.81):
     rrFunHes = ca.Function("rrHes", [v], [ca.jacobian(rrFunJac(v), v)])
 
     # function evaluations to get coefficients
-    rr0 = rrFun(0).full()[0][0]
-    rr1 = rrFunJac(0).full()[0][0]
-    rr2 = rrFunHes(0).full()[0][0]
+    rr0 = float(rrFun(0))
+    rr1 = float(rrFunJac(0))
+    rr2 = float(rrFunHes(0))
 
     return rr0, rr1, rr2
 
@@ -28,4 +28,4 @@ def SauthoffCoefficients(numCoaches, mass, g=9.81):
 if __name__ == '__main__':
 
     # example Stadler KISS
-    print(SauthoffCoefficients(6, 297000))
+    print(Sauthoff_coefficients(6, 297000))
