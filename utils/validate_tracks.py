@@ -7,37 +7,37 @@ class TrackValidator():
 
     def __init__(self):
 
-        self.requiredFields = {'metadata', 'stops', 'speed limits'}
+        self.required_fields = {'metadata', 'stops', 'speed limits'}
 
-        self.optionalFields = {'altitude', 'gradients', 'curvatures'}
+        self.optional_fields = {'altitude', 'gradients', 'curvatures'}
 
-        self.requiredMetadata = {'id', 'library version'}
+        self.required_metadata = {'id', 'library version'}
 
-        self.optionalMetadata = {'description', 'created by', 'license'}
+        self.optional_metadata = {'description', 'created by', 'license'}
 
-        self.trackData = None
-
-
-    def validateTrack(self, filename):
-
-        self.loadJson(filename)
-
-        self.validateKeys()
-
-        self.validateMetadata()
-
-        self.validateAltitude()
-
-        self.validateStops()
-
-        self.validateSpeedLimits()
-
-        self.validateGradients()
-
-        self.validateCurvatures()
+        self.track_data = None
 
 
-    def loadJson(self, filename):
+    def validate_track(self, filename):
+
+        self.load_json(filename)
+
+        self.validate_keys()
+
+        self.validate_metadata()
+
+        self.validate_altitude()
+
+        self.validate_stops()
+
+        self.validate_speed_limits()
+
+        self.validate_gradients()
+
+        self.validate_curvatures()
+
+
+    def load_json(self, filename):
 
         try:
 
@@ -49,68 +49,68 @@ class TrackValidator():
 
             raise FileNotFoundError("Specified track file not found!")
 
-        self.trackData = data
+        self.track_data = data
         self.filename = filename
 
 
-    def validateKeys(self):
+    def validate_keys(self):
         "Check that all required keys are there and that there are no redundant fields."
 
-        data = self.trackData
+        data = self.track_data
 
-        requiredFields = set()
+        required_fields = set()
 
         for key in data.keys():
 
-            if key in self.requiredFields:
+            if key in self.required_fields:
 
-                requiredFields.add(key)
+                required_fields.add(key)
 
-            elif key not in self.optionalFields:
+            elif key not in self.optional_fields:
 
                 raise ValueError("Unknown field detected: {}'!".format(key))
 
-        if requiredFields != self.requiredFields:
+        if required_fields != self.required_fields:
 
-            missing = ", ".join([f"'{item}'" for item in self.requiredFields-requiredFields])
+            missing = ", ".join([f"'{item}'" for item in self.required_fields-required_fields])
             output = f"Not all required fields found! Missing: {missing}!"
 
             raise ValueError(output)
 
 
-    def validateMetadata(self):
+    def validate_metadata(self):
 
-        metadata = self.trackData['metadata']
+        metadata = self.track_data['metadata']
 
-        requiredMetadata = set()
+        required_metadata = set()
 
         for key in metadata.keys():
 
-            if key in self.requiredMetadata:
+            if key in self.required_metadata:
 
-                requiredMetadata.add(key)
+                required_metadata.add(key)
 
-            elif key not in self.optionalMetadata:
+            elif key not in self.optional_metadata:
 
                 raise ValueError("Unknown field detected in metadata: {}'!".format(key))
 
-        if requiredMetadata != self.requiredMetadata:
+        if required_metadata != self.required_metadata:
 
-            missingMetadata = ", ".join([f"'{item}'" for item in self.requiredMetadata-requiredMetadata])
-            outputMetadata = f"Not all required fields found in metadata! Missing: {missingMetadata}!"
+            missing_metadata = ", ".join([f"'{item}'" for item in self.required_metadata-required_metadata])
+            output_metadata = f"Not all required fields found in metadata! Missing: {missing_metadata}!"
 
-            raise ValueError(outputMetadata)
+            raise ValueError(output_metadata)
 
-        trackID, _ = os.path.splitext(self.filename.split(os.path.sep)[-1])
+        track_ID, _ = os.path.splitext(self.filename.split(os.path.sep)[-1])
 
-        if trackID != metadata['id']:
+        if track_ID != metadata['id']:
 
             raise ValueError("Inconsistent ID between filename and metadata!")
 
 
-    def validateAltitude(self):
+    def validate_altitude(self):
 
-        altitude = self.trackData['altitude'] if 'altitude' in self.trackData else None
+        altitude = self.track_data['altitude'] if 'altitude' in self.track_data else None
 
         if altitude is not None:
 
@@ -133,9 +133,9 @@ class TrackValidator():
                 raise ValueError("'altitude' must be positive!")
 
 
-    def validateStops(self):
+    def validate_stops(self):
 
-        stops = self.trackData['stops']
+        stops = self.track_data['stops']
 
         fields = {'unit', 'values'}
 
@@ -168,31 +168,31 @@ class TrackValidator():
                 raise ValueError("Values in 'stops' must be strictly increasing!")
 
 
-    def validateSpeedLimits(self):
+    def validate_speed_limits(self):
 
-        speedLimits = self.trackData['speed limits']
+        speed_limits = self.track_data['speed limits']
 
         fields = {'units', 'values'}
 
-        if fields != speedLimits.keys():
+        if fields != speed_limits.keys():
 
             raise ValueError("Unexpected keys in 'speed limits'! Expecting 'units' and 'values'.")
 
-        fieldsUnits = {'position', 'velocity'}
+        fields_units = {'position', 'velocity'}
 
-        if fieldsUnits != speedLimits['units'].keys():
+        if fields_units != speed_limits['units'].keys():
 
             raise ValueError("Unexpected keys in  units of 'speed limits'! Expecting 'position' and 'velocity'.")
 
-        if speedLimits['units']['position'] not in {'m', 'km'}:
+        if speed_limits['units']['position'] not in {'m', 'km'}:
 
             raise ValueError("Unexpected unit in position of 'speed limits'! Expecting 'm' or 'km'.")
 
-        if speedLimits['units']['velocity'] not in {'km/h', 'm/s'}:
+        if speed_limits['units']['velocity'] not in {'km/h', 'm/s'}:
 
             raise ValueError("Unexpected unit in velocity of 'speed limits'! Expecting 'km/h' or 'm/s'.")
 
-        for ii, v in enumerate(speedLimits['values']):
+        for ii, v in enumerate(speed_limits['values']):
 
             if len(v) != 2:
 
@@ -218,24 +218,24 @@ class TrackValidator():
 
                     raise ValueError("First position of 'speed limits' must be equal to zero!")
 
-            if len(speedLimits['values']) > 1 and ii == len(speedLimits['values'])-1:
+            if len(speed_limits['values']) > 1 and ii == len(speed_limits['values'])-1:
 
-                if pos == self.trackData['stops']['values'][-1]:
+                if pos == self.track_data['stops']['values'][-1]:
 
                     raise ValueError("Last position of 'speed limits' must be smaller than the track length!")
 
-            if ii > 0 and pos <= speedLimits['values'][ii-1][0]:
+            if ii > 0 and pos <= speed_limits['values'][ii-1][0]:
 
                 raise ValueError("Positions in 'speed limits' must be strictly increasing! Error at point {}.".format(ii+1))
 
 
-    def validateGradients(self):
+    def validate_gradients(self):
 
-        if not 'gradients' in self.trackData:
+        if not 'gradients' in self.track_data:
 
             return
 
-        gradients = self.trackData['gradients']
+        gradients = self.track_data['gradients']
 
         fields = {'units', 'values'}
 
@@ -243,9 +243,9 @@ class TrackValidator():
 
             raise ValueError("Unexpected keys in 'gradients'! Expecting 'units' and 'values'.")
 
-        fieldsUnits = {'position', 'slope'}
+        fields_units = {'position', 'slope'}
 
-        if fieldsUnits != gradients['units'].keys():
+        if fields_units != gradients['units'].keys():
 
             raise ValueError("Unexpected keys in  units of 'gradients'! Expecting 'position' and 'slope'.")
 
@@ -285,7 +285,7 @@ class TrackValidator():
 
             if len(gradients['values']) > 1 and ii == len(gradients['values'])-1:
 
-                if pos == self.trackData['stops']['values'][-1]:
+                if pos == self.track_data['stops']['values'][-1]:
 
                     raise ValueError("Last position of 'gradients' must be smaller than the track length!")
 
@@ -294,13 +294,13 @@ class TrackValidator():
                 raise ValueError("Positions in 'gradients' must be strictly increasing! Error at point {}.".format(ii+1))
 
 
-    def validateCurvatures(self):
+    def validate_curvatures(self):
 
-        if not 'curvatures' in self.trackData:
+        if not 'curvatures' in self.track_data:
 
             return
 
-        curvatures = self.trackData['curvatures']
+        curvatures = self.track_data['curvatures']
 
         fields = {'units', 'values'}
 
@@ -308,9 +308,9 @@ class TrackValidator():
 
             raise ValueError("Unexpected keys in 'curvatures'! Expecting 'units' and 'values'.")
 
-        fieldsUnits = {'position', 'radius at start', 'radius at end'}
+        fields_units = {'position', 'radius at start', 'radius at end'}
 
-        if fieldsUnits != curvatures['units'].keys():
+        if fields_units != curvatures['units'].keys():
 
             raise ValueError("Unexpected keys in units of 'curvatures'! Expecting 'position', 'radius at start' and 'radius at end'.")
 
@@ -321,7 +321,7 @@ class TrackValidator():
         if curvatures['units']['radius at start'] not in {'m', 'km'}:
 
             raise ValueError("Unexpected unit in 'radius at start' of 'curvatures'! Expecting 'm' or 'km'.")
-        
+
         if curvatures['units']['radius at end'] not in {'m', 'km'}:
 
             raise ValueError("Unexpected unit in 'radius at end' of 'curvatures'! Expecting 'm' or 'km'.")
@@ -332,12 +332,12 @@ class TrackValidator():
 
                 raise ValueError("Unexpected size of nested list in 'curvatures'! Expecting 3, got {}.".format(len(v)))
 
-            pos = v[0] 
+            pos = v[0]
 
             if type(pos) not in {float, int}:
 
                 raise ValueError("Unexpected value type in position of 'curvatures'! Expecting float or int, found {}.".format(type(pos)))
-            
+
             try:
 
                 float(v[1])
@@ -345,13 +345,13 @@ class TrackValidator():
             except:
 
                 raise ValueError("Unexpected value for 'radius at start' in 'curvatures'! Expecting a number or 'infinity' got '{}' at position {}.".format(v[1], ii))
-            
+
             try:
 
                 float(v[2])
 
             except:
-                
+
                 raise ValueError("Unexpected value for 'radius at end' in 'curvatures'! Expecting a number or 'infinity' got {} at position {}.".format(v[2], ii))
 
             if pos < 0:
@@ -366,7 +366,7 @@ class TrackValidator():
 
             if len(curvatures['values']) > 1 and ii == len(curvatures['values'])-1:
 
-                if pos == self.trackData['stops']['values'][-1]:
+                if pos == self.track_data['stops']['values'][-1]:
 
                     raise ValueError("Last position of 'curvatures' must be smaller than the track length!")
 
@@ -379,9 +379,9 @@ if __name__ == '__main__':
 
     validator = TrackValidator()
 
-    tracksDir = "../tracks"
+    tracks_dir = "../tracks"
 
-    for file in os.listdir(tracksDir):
+    for file in os.listdir(tracks_dir):
 
         if file.endswith(".json"):
 
@@ -389,7 +389,7 @@ if __name__ == '__main__':
 
             print("Validating track: {}".format(id))
 
-            validator.validateTrack(os.path.join(tracksDir, file))
+            validator.validate_track(os.path.join(tracks_dir, file))
 
             print("ok")
 
