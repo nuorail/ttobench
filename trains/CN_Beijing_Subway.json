@@ -1,0 +1,60 @@
+{
+    "metadata": {
+        "id": "CN_Beijing_Subway",
+        "created by": "Dimitris Kouzoupis",
+        "library version": "TTOBench v1.3",
+        "license": "BSD 2-Clause License"
+    },
+    "mass": {
+        "unit": "kg",
+        "value": 278000
+    },
+    "rho": {
+        "unit": "%",
+        "value": 0.0
+    },
+    "max traction power": {
+        "unit": "kW",
+        "value": 3100.0
+    },
+    "max reg braking power": {
+        "unit": "kW",
+        "value": 4333.0
+    },
+    "max traction force": {
+        "unit": "kN",
+        "value": 310.0
+    },
+    "max reg braking force": {
+        "unit": "kN",
+        "value": 260.0
+    },
+    "max pn braking force": {
+        "unit": "kN",
+        "value": 0.0
+    },
+    "max speed": {
+        "unit": "km/h",
+        "value": 80
+    },
+    "rolling resistance r0": {
+        "unit": "kN",
+        "value": 3.9476
+    },
+    "rolling resistance r1": {
+        "unit": "kN/(km/h)",
+        "value": 0.0
+    },
+    "rolling resistance r2": {
+        "unit": "kN/(km/h)^2",
+        "value": 0.0022294
+    },
+    "efficiency traction": {
+        "unit": "%",
+        "value": 70.0
+    },
+    "efficiency reg brake": {
+        "unit": "%",
+        "value": 80.0
+    }
+}

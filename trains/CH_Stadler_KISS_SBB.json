@@ -1,0 +1,76 @@
+{
+    "metadata": {
+        "id": "CH_Stadler_KISS_SBB",
+        "created by": "Dimitris Kouzoupis",
+        "library version": "TTOBench v1.3",
+        "license": "BSD 2-Clause License"
+    },
+    "num seats": {
+        "unit": "-",
+        "value":535
+    },
+    "num coaches": {
+        "unit": "-",
+        "value": 6
+    },
+    "mass": {
+        "unit": "kg",
+        "value": 297000.0
+    },
+    "rho": {
+        "unit": "%",
+        "value": 10
+    },
+    "max traction power": {
+        "unit": "kW",
+        "value": 6000.0
+    },
+    "max reg braking power": {
+        "unit": "kW",
+        "value": 6000.0
+    },
+    "max traction force": {
+        "unit": "kN",
+        "value": 400.0
+    },
+    "max reg braking force": {
+        "unit": "kN",
+        "value": 400.0
+    },
+    "max pn braking force": {
+        "unit": "kN",
+        "value": 2970.0
+    },
+    "max acceleration": {
+        "unit": "m/s^2",
+        "value": 1.1
+    },
+    "max deceleration": {
+        "unit": "m/s^2",
+        "value": 1.1
+    },
+    "max speed": {
+        "unit": "km/h",
+        "value": 160
+    },
+    "rolling resistance r0": {
+        "unit": "kN",
+        "value": 5.672025
+    },
+    "rolling resistance r1": {
+        "unit": "kN/(km/h)",
+        "value": 0.025449525
+    },
+    "rolling resistance r2": {
+        "unit": "kN/(km/h)^2",
+        "value": 0.00121104
+    },
+    "efficiency traction": {
+        "unit": "%",
+        "value": 0.9
+    },
+    "efficiency reg brake": {
+        "unit": "%",
+        "value": 0.9
+    }
+}
