@@ -1,8 +1,11 @@
 import casadi as ca
 
 def Sauthoff_coefficients(numCoaches, mass, g=9.81):
-    # input: velocity in km/h, mass in kg
-    # output: force in kN
+    """
+    F = r0 + r1*v + r2*v**2, with v in km/h and F in kN.
+
+    Mass input in kg.
+    """
 
     v = ca.SX.sym('v')
 
