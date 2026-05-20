@@ -1,3 +1,4 @@
+import math
 import os
 
 import json
@@ -35,6 +36,8 @@ class TrackValidator():
         self.validate_gradients()
 
         self.validate_curvatures()
+
+        self.validate_tunnels()
 
 
     def load_json(self, filename):
@@ -373,6 +376,97 @@ class TrackValidator():
             if ii > 0 and pos <= curvatures['values'][ii-1][0]:
 
                 raise ValueError("Positions in 'curvatures' must be strictly increasing! Error at point {}.".format(ii+1))
+
+
+    def validate_tunnels(self):
+
+        if not 'tunnels' in self.track_data:
+
+            return
+
+        tunnels = self.track_data['tunnels']
+
+        fields = {'units', 'values'}
+
+        if fields != tunnels.keys():
+
+            raise ValueError("Unexpected keys in 'tunnels'! Expecting 'units' and 'values'.")
+
+        fields_units = {'position', 'length', 'cross section'}
+
+        if fields_units != tunnels['units'].keys():
+
+            raise ValueError("Unexpected keys in units of 'tunnels'! Expecting 'position', 'length' and 'cross section'.")
+
+        if tunnels['units']['position'] not in {'m', 'km'}:
+
+            raise ValueError("Unexpected unit in 'position' of 'tunnels'! Expecting 'm' or 'km'.")
+
+        if tunnels['units']['length'] not in {'m', 'km'}:
+
+            raise ValueError("Unexpected unit in 'length' of 'tunnels'! Expecting 'm' or 'km'.")
+
+        if tunnels['units']['length'] not in {'m^2'}:
+
+            raise ValueError("Unexpected unit in 'cross section' of 'tunnels'! Expecting 'm^2'.")
+
+        for ii, v in enumerate(tunnels['values']):
+
+            if len(v) != 3:
+
+                raise ValueError("Unexpected size of nested list in 'tunnels'! Expecting 3, got {}.".format(len(v)))
+
+            pos = v[0]
+
+            if type(pos) not in {float, int}:
+
+                raise ValueError("Unexpected value type in position of 'tunnels'! Expecting float or int, found {}.".format(type(pos)))
+
+            try:
+
+                length = float(v[1])
+
+            except:
+
+                raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
+
+            if not math.isfinite(length):
+
+                raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
+
+            if length > 0:
+
+                raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
+
+            if pos + length > self.track_data['stops']['values'][-1]:
+
+                raise ValueError("End of tunnel must be smaller than the track length!")
+
+            try:
+
+                cross_section = float(v[2])
+
+            except:
+
+                raise ValueError("Unexpected value for 'cross section' in 'tunnels'! Expecting a finite number, got {} at position {}.".format(v[2], ii))
+
+            if not math.isfinite(cross_section):
+
+                raise ValueError("Unexpected value for 'cross section' in 'tunnels'! Expecting a finite number, got '{}' at position {}.".format(v[2], ii))
+
+            if pos < 0:
+
+                raise ValueError("Position of 'tunnels' must be positive!")
+
+            if len(tunnels['values']) > 1 and ii == len(tunnels['values'])-1:
+
+                if pos == self.track_data['stops']['values'][-1]:
+
+                    raise ValueError("Last position of 'tunnels' must be smaller than the track length!")
+
+            if ii > 0 and pos <= tunnels['values'][ii-1][0]:
+
+                raise ValueError("Positions in 'tunnels' must be strictly increasing! Error at point {}.".format(ii+1))
 
 
 if __name__ == '__main__':
