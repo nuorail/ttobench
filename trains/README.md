@@ -40,5 +40,9 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `rolling resistance r2`: quadratic coefficient of rolling resistance.
 
+- `tunnel resistance 24 m^2"`: additive tunnel coefficient for a tunnel with cross section of 24 m^2.
+
+- `rolling resistance r1`: additive tunnel coefficient for a tunnel with cross section of 40 m^2.
+
 NOTE: documentation of vehicle efficiency is pending.
 

@@ -54,6 +54,12 @@ however, makes a clear distinction between points with a speed limit change,
 points with a slope change, and points with a curvature change. In this way the
 interpretation of track properties is simplified.
 
+- `tunnels`: a list of triples - position, length, and cross section - indicating the
+beginnings of track sections with tunnels and their respective length and cross section
+The positions must be strictly increasing and the length must be nonnegative.
+The position of a tunnel and its length must be shorter then the length of the whole track.
+The field can be omitted for tracks without tunnels.
+
 ## Content
 
 - [This table](tracks.csv) summarizes the collected benchmark instances and some of their properties

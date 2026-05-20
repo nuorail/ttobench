@@ -63,9 +63,10 @@ def print_tracks(tracks_dir, filename=None):
             positions = sorted(set(speed_limit_positions + gradient_positions + radius_positions + [length]))
             intervals = np.diff(positions)
 
-            num_tunnels = None
-
-            tunnel_lengths = None
+            if not 'tunnels' in data:
+                tunnel_lengths = None
+            else:
+                tunnel_lengths = [v[0]*(1e3 if data['tunnels']['units']['length'] == 'km' else 1) for v in data['tunnels']['values']]  # m
 
             rows += [[
                 id,
@@ -79,9 +80,9 @@ def print_tracks(tracks_dir, filename=None):
                 float(round(max(intervals), 1)),
                 len(intervals),
                 num_stops,
-                num_tunnels,
-                min(tunnel_lengths),
-                max(tunnel_lengths)
+                len(tunnel_lengths) if tunnel_lengths is not None else 0,
+                min(tunnel_lengths) if tunnel_lengths is not None else 0,
+                max(tunnel_lengths) if tunnel_lengths is not None else 0
                 ]]
 
     if filename is not None:
