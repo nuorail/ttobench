@@ -406,7 +406,7 @@ class TrackValidator():
 
             raise ValueError("Unexpected unit in 'length' of 'tunnels'! Expecting 'm' or 'km'.")
 
-        if tunnels['units']['length'] not in {'m^2'}:
+        if tunnels['units']['cross section'] not in {'m^2'}:
 
             raise ValueError("Unexpected unit in 'cross section' of 'tunnels'! Expecting 'm^2'.")
 
@@ -430,11 +430,7 @@ class TrackValidator():
 
                 raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
 
-            if not math.isfinite(length):
-
-                raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
-
-            if length > 0:
+            if not math.isfinite(length) or length < 0:
 
                 raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
 
@@ -450,7 +446,7 @@ class TrackValidator():
 
                 raise ValueError("Unexpected value for 'cross section' in 'tunnels'! Expecting a finite number, got {} at position {}.".format(v[2], ii))
 
-            if not math.isfinite(cross_section):
+            if not math.isfinite(cross_section) or cross_section < 0:
 
                 raise ValueError("Unexpected value for 'cross section' in 'tunnels'! Expecting a finite number, got '{}' at position {}.".format(v[2], ii))
 
