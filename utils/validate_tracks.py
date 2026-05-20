@@ -9,7 +9,7 @@ class TrackValidator():
 
         self.required_fields = {'metadata', 'stops', 'speed limits'}
 
-        self.optional_fields = {'altitude', 'gradients', 'curvatures'}
+        self.optional_fields = {'altitude', 'gradients', 'curvatures', 'tunnels'}
 
         self.required_metadata = {'id', 'library version'}
 
