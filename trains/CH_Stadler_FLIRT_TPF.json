@@ -78,17 +78,19 @@
         "value": 0.9
     },
     "tunnel resistance": {
-        "unit": "kg/m",
-        "cross section unit": "m^2",
+        "units": {
+            "cross section": "m^2",
+            "resistance (or similar)": "kg/m"
+        },
         "values": [
-            {
-                "cross section": 24,
-                "value": 15.16
-            },
-            {
-                "cross section": 40,
-                "value": 7.23
-            }
+            [
+                24,
+                15.16
+            ],
+            [
+                40,
+                7.23
+            ]
         ]
     }
 }
