@@ -2,7 +2,7 @@
     "metadata": {
         "id": "CH_Stadler_FLIRT_TPF",
         "created by": "Dimitris Kouzoupis",
-        "library version": "TTOBench v1.3",
+        "library version": "TTOBench v1.4",
         "license": "BSD 2-Clause License"
     },
     "num seats": {
@@ -12,6 +12,10 @@
     "num coaches": {
         "unit": "-",
         "value": 4
+    },
+    "length": {
+        "unit": "m",
+        "value": 58.6
     },
     "mass": {
         "unit": "kg",

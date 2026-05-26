@@ -14,6 +14,8 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `num coaches` (optional): number of coaches in train configuration, including locomotive(s).
 
+- `length`: total length of the train.
+
 - `mass`: the mass of the train.
 
 - `rho` (optional): rotating mass factor. If omitted, total mass is equal to mass.
