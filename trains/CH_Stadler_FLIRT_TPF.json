@@ -72,5 +72,19 @@
     "efficiency reg brake": {
         "unit": "%",
         "value": 0.9
+    },
+    "tunnel resistance": {
+        "unit": "kg/m",
+        "cross section unit": "m^2",
+        "values": [
+            {
+                "cross section": 24,
+                "value": 15.16
+            },
+            {
+                "cross section": 40,
+                "value": 7.23
+            }
+        ]
     }
 }

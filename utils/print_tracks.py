@@ -20,7 +20,7 @@ def print_tracks(tracks_dir, filename=None):
         'Max interval [m]',
         'Num intervals [-]',
         'Num stops [-]',
-        'Num tunnels',
+        'Num tunnel sections with constant cross section [-]',
         'Min tunnel length [m]',
         'Max tunnel length [m]'
         ]]
@@ -64,8 +64,11 @@ def print_tracks(tracks_dir, filename=None):
             intervals = np.diff(positions)
 
             if not 'tunnels' in data:
+
                 tunnel_lengths = None
+
             else:
+
                 tunnel_lengths = [v[0]*(1e3 if data['tunnels']['units']['length'] == 'km' else 1) for v in data['tunnels']['values']]  # m
 
             rows += [[
