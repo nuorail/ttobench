@@ -20,7 +20,7 @@ def print_tracks(tracks_dir, filename=None):
         'Max interval [m]',
         'Num intervals [-]',
         'Num stops [-]',
-        'Num tunnel sections with constant cross section [-]',
+        'Num tunnel sections [-]',
         'Min tunnel length [m]',
         'Max tunnel length [m]'
         ]]
