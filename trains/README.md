@@ -14,7 +14,7 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `num coaches` (optional): number of coaches in train configuration, including locomotive(s).
 
-- `length`: total length of the train.
+- `length` (optional): total length of the train.
 
 - `mass`: the mass of the train.
 
