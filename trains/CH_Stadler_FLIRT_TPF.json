@@ -2,7 +2,7 @@
     "metadata": {
         "id": "CH_Stadler_FLIRT_TPF",
         "created by": "Dimitris Kouzoupis",
-        "library version": "TTOBench v1.3",
+        "library version": "TTOBench v1.4",
         "license": "BSD 2-Clause License"
     },
     "num seats": {
@@ -12,6 +12,10 @@
     "num coaches": {
         "unit": "-",
         "value": 4
+    },
+    "length": {
+        "unit": "m",
+        "value": 58.6
     },
     "mass": {
         "unit": "kg",
@@ -67,10 +71,26 @@
     },
     "efficiency traction": {
         "unit": "%",
-        "value": 0.9
+        "value": 90.0
     },
     "efficiency reg brake": {
         "unit": "%",
-        "value": 0.9
+        "value": 90.0
+    },
+    "tunnel resistance": {
+        "units": {
+            "cross section": "m^2",
+            "coefficient": "kN/(km/h)^2"
+        },
+        "values": [
+            [
+                24,
+                0.0011698
+            ],
+            [
+                40,
+                0.0005579
+            ]
+        ]
     }
 }

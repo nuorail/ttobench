@@ -67,10 +67,10 @@
     },
     "efficiency traction": {
         "unit": "%",
-        "value": 0.9
+        "value": 90.0
     },
     "efficiency reg brake": {
         "unit": "%",
-        "value": 0.9
+        "value": 90.0
     }
 }

@@ -14,6 +14,8 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `num coaches` (optional): number of coaches in train configuration, including locomotive(s).
 
+- `length` (optional): total length of the train.
+
 - `mass`: the mass of the train.
 
 - `rho` (optional): rotating mass factor. If omitted, total mass is equal to mass.
@@ -39,6 +41,8 @@ reasons. Optional fields: `description`, `created by` and `license`.
 - `rolling resistance r1`: linear coefficient of rolling resistance.
 
 - `rolling resistance r2`: quadratic coefficient of rolling resistance.
+
+- `tunnel resistance` (optional): coefficients for additional aerodynamic resistance in tunnels, given for different tunnel cross-sectional areas. The field is a dictionary indexed by `cross section`.
 
 NOTE: documentation of vehicle efficiency is pending.
 

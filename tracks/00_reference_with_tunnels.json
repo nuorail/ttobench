@@ -1,0 +1,64 @@
+{
+    "metadata": {
+        "id": "00_reference_with_tunnels",
+        "created by": "Roland Staerk",
+        "library version": "TTOBench v1.4",
+        "license": "BSD 2-Clause License"
+    },
+    "altitude": {
+        "unit": "m",
+        "value": 0
+    },
+    "stops": {
+        "unit": "m",
+        "values": [
+            0.0,
+            8500.0,
+            13710.0,
+            48531.0
+        ]
+    },
+    "speed limits": {
+        "units": {
+            "position": "m",
+            "velocity": "km/h"
+        },
+        "values": [
+            [
+                0.0,
+                140
+            ]
+        ]
+    },
+    "gradients": {
+        "units": {
+            "position": "m",
+            "slope": "permil"
+        },
+        "values": [
+            [
+                0.0,
+                0.0
+            ]
+        ]
+    },
+    "tunnels": {
+        "units": {
+            "position": "m",
+            "length": "m",
+            "cross section": "m^2"
+        },
+        "values": [
+            [
+                7000.0,
+                1050.0,
+                40.0
+            ],
+            [
+                20000.0,
+                5050.0,
+                24.0
+            ]
+        ]
+    }
+}
