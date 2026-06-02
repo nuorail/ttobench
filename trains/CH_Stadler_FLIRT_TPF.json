@@ -71,25 +71,25 @@
     },
     "efficiency traction": {
         "unit": "%",
-        "value": 0.9
+        "value": 90.0
     },
     "efficiency reg brake": {
         "unit": "%",
-        "value": 0.9
+        "value": 90.0
     },
     "tunnel resistance": {
         "units": {
             "cross section": "m^2",
-            "coefficient": "kg/m"
+            "coefficient": "kN/(km/h)^2"
         },
         "values": [
             [
                 24,
-                15.16
+                0.0011698
             ],
             [
                 40,
-                7.23
+                0.0005579
             ]
         ]
     }
