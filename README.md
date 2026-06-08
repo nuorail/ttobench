@@ -1,4 +1,4 @@
-# TTOBench v1.3
+# TTOBench v1.4
 Open-source library for train trajectory optimization
 
 ## Content
@@ -6,6 +6,8 @@ Open-source library for train trajectory optimization
 - [Track library with benchmark instances in JSON format](tracks/README.md)
 
 - [Train library with benchmark instances in JSON format](trains/README.md)
+
+- [Journey library with benchmark instances in JSON format](journeys/README.md)
 
 - [Python utils](utils/)
 
