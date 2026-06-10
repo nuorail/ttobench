@@ -92,5 +92,55 @@
                 0.0005579
             ]
         ]
+    },
+    "ETCS braking data": {
+        "A_brake_emergency": {
+            "units": {
+                "velocity": "m/s",
+                "deceleration": "m/s^2"
+            },
+            "values": [
+                [0,  0.9],
+                [20, 0.85],
+                [40, 0.8],
+                [60, 0.75]
+            ]
+        },
+        "A_brake_service": {
+            "units": {
+                "velocity": "m/s",
+                "deceleration": "m/s^2"
+            },
+            "values": [
+                [0,  0.55],
+                [20, 0.5],
+                [40, 0.45],
+                [60, 0.4]
+            ]
+        },
+        "K_dry_rst": {
+            "unit": "-",
+            "value": 0.8
+        },
+        "K_wet_rst": {
+            "unit": "-",
+            "value": 0.9
+        },
+        "T_traction": {
+            "unit": "s",
+            "value": 1
+        },
+        "T_be": {
+            "unit": "s",
+            "value": 4
+        },
+        "v_uncertainty": {
+            "unit": "%",
+            "value": 2.98
+        },
+        "T_bs": {
+            "unit": "s",
+            "value": 3
+        }
     }
 }

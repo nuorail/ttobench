@@ -44,5 +44,24 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `tunnel resistance` (optional): coefficients for additional aerodynamic resistance in tunnels, given for different tunnel cross-sectional areas. The field is a dictionary indexed by `cross section`.
 
+- `ETCS braking data` (optional): train-specific parameters used for the simplified calculation of ETCS braking curves. The field contains emergency and service braking deceleration curves as functions of velocity, as well as correction factors, time delays and speed uncertainty values. Infrastructure-dependent ETCS braking parameters are defined in the Track.json.
+  If `ETCS braking data` is defined, all of the following subfields must be provided:
+
+  - `A_brake_emergency`: emergency braking deceleration curve. Each entry contains velocity and the corresponding emergency braking deceleration. Braking deceleration are positive by convention.
+
+  - `A_brake_service`: service braking deceleration curve. Each entry contains velocity and the corresponding service braking deceleration. Braking deceleration are positive by convention.
+
+  - `K_dry_rst`: correction factor for dry rail conditions.
+
+  - `K_wet_rst`: correction factor for wet rail conditions.
+
+  - `T_traction`: traction cut-off delay.
+
+  - `T_be`: emergency brake build-up time.
+
+  - `T_bs`: service brake build-up time.
+
+  - `v_uncertainty`: train-related speed uncertainty.
+
 NOTE: documentation of vehicle efficiency is pending.
 
