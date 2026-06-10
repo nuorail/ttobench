@@ -7,5 +7,37 @@
     },
     "associated track id": {
       "id": "CH_StGallen_Wil"
+    },
+    "timing points": {
+       "units": {
+         "position": "m",
+         "lower time constraint": "s",
+         "upper time constraint": "s",
+         "lower speed constraint": "km/h",
+         "upper speed constraint": "km/h"
+      },
+       "values": [
+          {
+            "position": 0,
+            "lower time constraint": 0,
+            "upper time constraint": 0,
+            "lower speed constraint": 0,
+            "upper speed constraint": 0
+          },
+          {
+            "position": 12500,
+            "lower time constraint": 480,
+            "upper time constraint": 540,
+            "lower speed constraint": 10,
+            "upper speed constraint": null
+          },
+          {
+            "position": 25000,
+            "lower time constraint": 1020,
+            "upper time constraint": 1080,
+            "lower speed constraint": 0,
+            "upper speed constraint": 0
+          }
+      ]
     }
 }
