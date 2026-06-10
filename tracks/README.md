@@ -59,9 +59,9 @@ The field can be omitted for tracks without tunnels.
 simplified calculation of ETCS braking curves. If `ETCS braking data` is defined,
 all of the following subfields must be provided:
 
-  - `M_NVAVADH`: additional delay for the availability of the emergency brake.
+  - `M_NVAVADH`: national value defining the additional delay before the emergency brake is considered available.
 
-  - `Kt_int`: intervention correction factor.
+  - `Kt_int`: correction factor used for the intervention braking curve.
 
 Note that the positions of speed limits, gradients, and curvatures will in general 
 not coincide and a preprocessing step to derive track sections with constant properties
