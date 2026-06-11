@@ -10,7 +10,7 @@ class TrackValidator():
 
         self.required_fields = {'metadata', 'stops', 'speed limits'}
 
-        self.optional_fields = {'altitude', 'gradients', 'curvatures', 'tunnels'}
+        self.optional_fields = {'altitude', 'gradients', 'curvatures', 'tunnels', 'ETCS braking data'}
 
         self.required_metadata = {'id', 'library version'}
 
@@ -38,6 +38,8 @@ class TrackValidator():
         self.validate_curvatures()
 
         self.validate_tunnels()
+
+        self.validate_etcs_braking_data()
 
 
     def load_json(self, filename):
@@ -463,6 +465,70 @@ class TrackValidator():
             if ii > 0 and pos <= tunnels['values'][ii-1][0]:
 
                 raise ValueError("Positions in 'tunnels' must be strictly increasing! Error at point {}.".format(ii+1))
+
+
+    def validate_parameter_dict(self, key, parameter, units, strictly_positive=True, integer=False, upper_bound=None):
+
+        fields = {'unit', 'value'}
+
+        if fields != parameter.keys():
+
+            raise ValueError("Unexpected keys in '{}'! Expecting 'unit' and 'value'.".format(key))
+
+        if parameter['unit'] not in units:
+
+            raise ValueError("Unexpected unit in '{}'!".format(key))
+
+        value = parameter['value']
+
+        if type(value) not in {float, int}:
+
+            raise ValueError("Unexpected value type in '{}'! Expecting float or int, found {}.".format(key, type(value)))
+
+        if integer and type(value) is not int:
+
+            raise ValueError("Unexpected value type in '{}'! Expecting int, found {}.".format(key, type(value)))
+
+        if not math.isfinite(value):
+
+            raise ValueError("Value in '{}' must be finite!".format(key))
+
+        if strictly_positive and value <= 0:
+
+            raise ValueError("Value in '{}' must be strictly positive!".format(key))
+
+        if not strictly_positive and value < 0:
+
+            raise ValueError("Value in '{}' must be positive!".format(key))
+
+        if upper_bound is not None:
+
+            upper_bound = upper_bound[parameter['unit']] if isinstance(upper_bound, dict) else upper_bound
+
+            if value > upper_bound:
+
+                raise ValueError("Value in '{}' must be smaller than or equal to {}!".format(key, upper_bound))
+
+
+    def validate_etcs_braking_data(self):
+
+        if not 'ETCS braking data' in self.track_data:
+
+            return
+
+        etcs_data = self.track_data['ETCS braking data']
+
+        fields = {'M_NVAVADH', 'Kt_int'}
+
+        if fields != etcs_data.keys():
+
+            missing = ", ".join([f"'{item}'" for item in fields - set(etcs_data)])
+            redundant = ", ".join([f"'{item}'" for item in set(etcs_data) - fields])
+
+            raise ValueError("Unexpected keys in 'ETCS braking data'! Missing: {}. Redundant: {}.".format(missing, redundant))
+
+        self.validate_parameter_dict('M_NVAVADH', etcs_data['M_NVAVADH'], {'-'}, strictly_positive=False)
+        self.validate_parameter_dict('Kt_int', etcs_data['Kt_int'], {'-'})
 
 
 if __name__ == '__main__':
