@@ -121,6 +121,16 @@ class JourneyValidator():
 
         track_id = self.journey_data['associated track id']['id']
 
+        journey_id = self.journey_data['metadata']['id']
+
+        if type(track_id) is not str:
+
+            raise ValueError("Unexpected value type in 'associated track id'! Expecting str.")
+
+        if not journey_id.startswith(track_id + "_"):
+
+            raise ValueError("Journey ID must start with associated track ID followed by '_'!")
+
         track_filename = os.path.join(tracks_dir, track_id + ".json")
 
         try:

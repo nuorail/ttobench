@@ -8,9 +8,10 @@ list of timing points. The first timing point defines the departure and the last
 timing point defines the arrival.
 
 - `metadata` : a dictionary of key-value pairs with general information on the
-file content. Required fields: `id`, a unique identifier of the train that should
-contain only letters, numbers and underscores, and `library version` for compatibility
-reasons. Optional fields: `description`, `created by` and `license`.
+file content. Required fields: `id`, a unique identifier of the journey that
+should contain only letters, numbers and underscores, and `library version` for compatibility
+reasons. The journey `id` must start with the `associated track id` followed by an underscore.
+Optional fields: `description`, `created by` and `license`.
 
 - `associated track id`: the unique identifier of the associated track JSON file.
 
