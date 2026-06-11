@@ -18,7 +18,7 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `mass`: the mass of the train.
 
-- `rho` (optional): rotating mass factor. If omitted, total mass is equal to mass.
+- `rho`: rotating mass factor. If omitted, total mass is equal to mass.
 
 - `max traction power`: maximum traction power of all motors.
 
