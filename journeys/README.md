@@ -14,8 +14,8 @@ and `library version` for compatibility
 reasons. The journey `id` must start with the `associated track` followed by an underscore.
 Optional fields: `description`, `created by` and `license`.
 
-- `timing points`: a dictionary containing the units and values of the timing
-points. Each timing point is defined as a list with the following order:
+- `timing points`: a list of lists containing the timing points. Each timing
+point is defined as a list with the following order:
   - `position`: the track coordinate of the timing point.
   - `lower time constraint`: the earliest allowed time at this position.
   - `upper time constraint`: the latest allowed time at this position.
