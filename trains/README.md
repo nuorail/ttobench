@@ -18,7 +18,7 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `mass`: the mass of the train.
 
-- `rho`: rotating mass factor. If omitted, total mass is equal to mass.
+- `rho` (optional): rotating mass factor. If omitted, total mass is equal to mass.
 
 - `max traction power`: maximum traction power of all motors.
 
@@ -44,8 +44,8 @@ reasons. Optional fields: `description`, `created by` and `license`.
 
 - `tunnel resistance` (optional): coefficients for additional aerodynamic resistance in tunnels, given for different tunnel cross-sectional areas. The field is a dictionary indexed by `cross section`.
 
-- `ETCS braking data` (optional): train-specific parameters used for the simplified calculation of ETCS braking curves. The field contains emergency and service braking deceleration curves as functions of velocity, as well as correction factors, time delays and speed uncertainty values. Infrastructure-dependent ETCS braking parameters are defined in the Track.json.
-  If `ETCS braking data` is defined, all of the following subfields must be provided:
+- `ETCS braking data` (optional): train-specific parameters used for the simplified calculation of ETCS braking curves. The field contains emergency and service braking deceleration curves as functions of velocity, as well as correction factors, time delays and speed uncertainty values. Infrastructure-dependent ETCS braking parameters are defined in the Track.json. 
+If `ETCS braking data` is defined, all of the following subfields must be provided:
 
   - `A_brake_emergency`: emergency braking deceleration curve. Each entry contains velocity and the corresponding emergency braking deceleration. Braking deceleration are positive by convention.
 

@@ -6,11 +6,11 @@ class JourneyValidator():
 
     def __init__(self):
 
-        self.required_fields = {'metadata', 'associated track id', 'timing points'}
+        self.required_fields = {'metadata', 'timing points'}
 
         self.optional_fields = set()
 
-        self.required_metadata = {'id', 'library version'}
+        self.required_metadata = {'id', 'associated track', 'library version'}
 
         self.optional_metadata = {'description', 'created by', 'license'}
 
@@ -25,9 +25,9 @@ class JourneyValidator():
 
         self.validate_metadata()
 
-        self.validate_associated_track(tracks_dir)
-
         self.validate_timing_points()
+
+        self.validate_associated_track(tracks_dir)
 
 
     def load_json(self, filename):
@@ -111,21 +111,14 @@ class JourneyValidator():
 
     def validate_associated_track(self, tracks_dir):
 
-        associated_track_id = self.journey_data['associated track id']
+        metadata = self.journey_data['metadata']
 
-        fields = {'id'}
-
-        if fields != associated_track_id.keys():
-
-            raise ValueError("Unexpected keys in 'associated track id'! Expecting 'id'.")
-
-        track_id = self.journey_data['associated track id']['id']
-
-        journey_id = self.journey_data['metadata']['id']
+        track_id = metadata['associated track']
+        journey_id = metadata['id']
 
         if type(track_id) is not str:
 
-            raise ValueError("Unexpected value type in 'associated track id'! Expecting str.")
+            raise ValueError("Unexpected value type in 'associated track'! Expecting str.")
 
         if not journey_id.startswith(track_id + "_"):
 
@@ -143,7 +136,7 @@ class JourneyValidator():
 
             raise FileNotFoundError("Associated track file not found: {}!".format(track_id))
 
-        arrival_position = self.journey_data['timing points']['values'][-1]['position']
+        arrival_position = self.journey_data['timing points']['values'][-1][0]
         departure_unit = self.journey_data['timing points']['units']['position']
 
         track_length = track_data['stops']['values'][-1]
@@ -196,25 +189,13 @@ class JourneyValidator():
 
             raise ValueError("'timing points' must contain at least two entries!")
 
-        fields_values = {
-            'position',
-            'lower time constraint',
-            'upper time constraint',
-            'lower speed constraint',
-            'upper speed constraint'
-        }
-
         for ii, v in enumerate(values):
 
-            if fields_values != v.keys():
+            if len(v) != 5:
+                raise ValueError(
+                    "Unexpected size of nested list in 'timing points'! Expecting 5, got {}.".format(len(v)))
 
-                raise ValueError("Unexpected keys in timing point {}!".format(ii+1))
-
-            pos = v['position']
-            t_min = v['lower time constraint']
-            t_max = v['upper time constraint']
-            v_min = v['lower speed constraint']
-            v_max = v['upper speed constraint']
+            pos, t_min, t_max, v_min, v_max = v
 
             if type(pos) not in {float, int}:
 
@@ -224,17 +205,21 @@ class JourneyValidator():
 
                 raise ValueError("Position of 'timing points' must be positive!")
 
-            if ii > 0 and pos <= values[ii-1]['position']:
+            if ii > 0 and pos <= values[ii-1][0]:
 
                 raise ValueError("Positions in 'timing points' must be strictly increasing! Error at point {}.".format(ii+1))
 
-            for key in ['lower time constraint', 'upper time constraint', 'lower speed constraint', 'upper speed constraint']:
+            for key, value in zip(
+                    ['lower time constraint', 'upper time constraint', 'lower speed constraint',
+                     'upper speed constraint'],
+                    [t_min, t_max, v_min, v_max]
+            ):
 
-                if v[key] is not None and type(v[key]) not in {float, int}:
+                if value is not None and type(value) not in {float, int}:
 
-                    raise ValueError("Unexpected value type in '{}' of 'timing points'! Expecting float, int or None, found {}.".format(key, type(v[key])))
+                    raise ValueError("Unexpected value type in '{}' of 'timing points'! Expecting float, int or None, found {}.".format(key, type(value)))
 
-                if v[key] is not None and v[key] < 0:
+                if value is not None and value < 0:
 
                     raise ValueError("'{}' of 'timing points' must be positive or None!".format(key))
 

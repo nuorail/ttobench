@@ -11,7 +11,6 @@ class TrainValidator():
         self.required_fields = {
             'metadata',
             'mass',
-            'rho',
             'max speed',
             'max traction power',
             'max reg braking power',
@@ -23,6 +22,7 @@ class TrainValidator():
         }
 
         self.optional_fields = {
+            'rho',
             'num seats',
             'num coaches',
             'length',

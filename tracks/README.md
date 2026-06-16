@@ -55,20 +55,20 @@ If a single physical tunnel has multiple cross sections along its length, split 
 multiple tunnel entries, one for each constant-cross-section section.
 The field can be omitted for tracks without tunnels.
 
-- `ETCS braking data` (optional): infrastructure-dependent parameters used for the
-simplified calculation of ETCS braking curves. If `ETCS braking data` is defined,
-all of the following subfields must be provided:
-
-  - `M_NVAVADH`: national value defining the additional delay before the emergency brake is considered available.
-
-  - `Kt_int`: correction factor used for the intervention braking curve.
-
 Note that the positions of speed limits, gradients, and curvatures will in general 
 not coincide and a preprocessing step to derive track sections with constant properties
 is necessary in the context of trajectory optimization. This representation,
 however, makes a clear distinction between points with a speed limit change,
 points with a slope change, and points with a curvature change. In this way the
 interpretation of track properties is simplified.
+
+- `ETCS braking data` (optional): infrastructure-dependent parameters used for the calculation of ETCS braking curves.
+The braking curve is computed for a "Gamma-Train" and intervention by the service brake is allways enabled. 
+If `ETCS braking data` is defined, all of the following subfields must be provided:
+
+  - `M_NVAVADH`: national value defining the additional delay before the emergency brake is considered available.
+
+  - `Kt_int`: correction factor used for the intervention braking curve.
 
 ## Content
 
