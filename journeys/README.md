@@ -4,8 +4,18 @@
 
 Every journey in the library is defined by a JSON file. A journey describes the
 timing constraints of a train run on a specific track. It consists of an ordered
-list of timing points. The first timing point defines the departure and the last
-timing point defines the arrival.
+list of timing points. 
+
+A journey file may contain one or more consecutive `journey sections`.
+A `journey section` is the part of the journey between two `stopping points`.
+
+There are two types of timing points:
+- `stopping points`: both speed constraints are set to `0`
+- `passing points`: at least one speed constraint is different from `0`, or the speed constraints are undefined
+
+Intermediate stations are represented by two consecutive `stopping points` at
+the same position: one for arrival and one for departure. The time difference
+between them defines the dwell time.
 
 - `metadata` : a dictionary of key-value pairs with general information on the
 file content. Required fields: `id`, a unique identifier of the journey that
@@ -28,13 +38,21 @@ point is defined as a list with the following order:
 The following rules should be fulfilled by every journey file:
 
 - The list of timing points must contain at least two entries.
-- Timing points must be ordered by increasing position.
-- The first timing point represents the departure.
-- The last timing point represents the arrival.
-- The first and last timing point must have both speed constraints set
-  to `0`, which defines departure and arrival at standstill.
+- Timing points must be ordered by non-decreasing position.
+- Equal positions are only allowed for consecutive `stopping points` that describe arrival and departure at the same station.
+- The first timing point represents the departure of the first journey section.
+- The last timing point represents the arrival of the last journey section.
+- The first and last timing point must have both speed constraints set to `0`.
+- Every journey section must start and end with a `stopping point`.
 - For every defined time constraint, the lower time constraint must be smaller
   than or equal to the upper time constraint.
 - For every defined speed constraint, the lower speed constraint must be smaller
   than or equal to the upper speed constraint.
 - A value of `null` means that the corresponding constraint is not set.
+
+## Journey section indexing
+
+A `journey section index` is used to select the desired journey section. The indexing starts from `0`.
+When the optimizer selects a journey section index, it crops the timing point
+list to the timing points between the corresponding departure and arrival stopping points.
+After cropping, time constraints may be shifted so that the selected departure time becomes `0`.

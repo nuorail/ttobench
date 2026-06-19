@@ -149,6 +149,27 @@ class JourneyValidator():
             raise ValueError("Arrival position must be smaller than or equal to the track length!")
 
 
+    def is_stopping_point(self, timing_point):
+
+        return timing_point[3] == 0 and timing_point[4] == 0
+
+    def get_journey_section_bounds(self, values):
+
+        departures = [0]
+        arrivals = []
+
+        for ii in range(1, len(values)):
+
+            if values[ii][0] == values[ii-1][0]:
+
+                arrivals.append(ii-1)
+                departures.append(ii)
+
+        arrivals.append(len(values)-1)
+
+        return list(zip(departures, arrivals))
+
+
     def validate_timing_points(self):
 
         timing_points = self.journey_data['timing points']
@@ -205,9 +226,23 @@ class JourneyValidator():
 
                 raise ValueError("Position of 'timing points' must be positive!")
 
-            if ii > 0 and pos <= values[ii-1][0]:
+            if ii > 0 and pos < values[ii-1][0]:
 
-                raise ValueError("Positions in 'timing points' must be strictly increasing! Error at point {}.".format(ii+1))
+                raise ValueError("Positions in 'timing points' must be non-decreasing! Error at point {}.".format(ii+1))
+
+            if ii > 0 and pos == values[ii - 1][0]:
+
+                if ii == 1 or ii == len(values) - 1:
+
+                    raise ValueError("Equal positions are only allowed for intermediate arrival/departure pairs! Error at point {}.".format(ii + 1))
+
+                if not self.is_stopping_point(v) or not self.is_stopping_point(values[ii - 1]):
+
+                    raise ValueError("Equal positions are only allowed for consecutive stopping points! Error at point {}.".format(ii + 1))
+
+                if ii > 1 and pos == values[ii - 2][0]:
+
+                    raise ValueError("More than two consecutive timing points at the same position are not allowed! Error at point {}.".format(ii + 1))
 
             for key, value in zip(
                     ['lower time constraint', 'upper time constraint', 'lower speed constraint',
@@ -236,6 +271,42 @@ class JourneyValidator():
                 if v_min != 0 or v_max != 0:
 
                     raise ValueError("First and last timing point must have both speed constraints set to zero!")
+
+        for ii, v in enumerate(values):
+
+            if ii == 0 or ii == len(values) - 1:
+
+                continue
+
+            if self.is_stopping_point(v):
+
+                pos = v[0]
+
+                if pos != values[ii - 1][0] and pos != values[ii + 1][0]:
+
+                    raise ValueError("Intermediate stopping points must be part of an arrival/departure pair! Error at point {}.".format(ii + 1))
+
+        journey_section_bounds = self.get_journey_section_bounds(values)
+
+        if len(journey_section_bounds) < 1:
+
+            raise ValueError("Journey must contain at least one journey section!")
+
+        for ii, bounds in enumerate(journey_section_bounds):
+
+            departure_idx, arrival_idx = bounds
+
+            if departure_idx >= arrival_idx:
+
+                raise ValueError("Invalid journey section {}!".format(ii))
+
+            if not self.is_stopping_point(values[departure_idx]) or not self.is_stopping_point(values[arrival_idx]):
+
+                raise ValueError("Journey section {} must start and end with a stopping point!".format(ii))
+
+            if values[departure_idx][0] >= values[arrival_idx][0]:
+
+                raise ValueError("Journey section {} must have increasing position!".format(ii))
 
 
 if __name__ == '__main__':
