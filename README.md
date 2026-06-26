@@ -1,4 +1,4 @@
-# TTOBench v1.4
+# TTOBench v1.5
 Open-source library for train trajectory optimization
 
 ## Content

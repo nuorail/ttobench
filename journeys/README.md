@@ -11,7 +11,7 @@ A `journey section` is the part of the journey between two `stopping points`.
 
 There are two types of timing points:
 - `stopping points`: both speed constraints are set to `0`
-- `passing points`: at least one speed constraint is different from `0`, or the speed constraints are undefined
+- `passing points`: lower bound greater `0`, or speed bounds are undefined
 
 Intermediate stations are represented by two consecutive `stopping points` at
 the same position: one for arrival and one for departure. The time difference
@@ -49,10 +49,3 @@ The following rules should be fulfilled by every journey file:
 - For every defined speed constraint, the lower speed constraint must be smaller
   than or equal to the upper speed constraint.
 - A value of `null` means that the corresponding constraint is not set.
-
-## Journey section indexing
-
-A `journey section index` is used to select the desired journey section. The indexing starts from `0`.
-When the optimizer selects a journey section index, it crops the timing point
-list to the timing points between the corresponding departure and arrival stopping points.
-After cropping, time constraints may be shifted so that the selected departure time becomes `0`.
