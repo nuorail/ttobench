@@ -1894,5 +1894,15 @@
                 -901.4
             ]
         ]
+    },
+    "ETCS braking data": {
+          "M_NVAVADH": {
+              "unit": "-",
+              "value": 0
+          },
+          "Kt_int": {
+              "unit": "-",
+              "value": 1.15
+          }
     }
 }

@@ -1,0 +1,62 @@
+{
+    "metadata": {
+      "id": "CH_StGallen_Wil_Journey_01",
+      "created by": "Roland Staerk",
+      "library version": "TTOBench v1.5",
+      "license": "BSD 2-Clause License",
+      "associated track": "CH_StGallen_Wil"
+    },
+    "timing points": {
+       "units": {
+         "position": "m",
+         "lower time constraint": "s",
+         "upper time constraint": "s",
+         "lower speed constraint": "km/h",
+         "upper speed constraint": "km/h"
+      },
+       "values": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            12500,
+            480,
+            540,
+            10,
+            null
+          ],
+          [
+            15000,
+            620,
+            680,
+            0,
+            0
+          ],
+          [
+            15000,
+            800,
+            840,
+            0,
+            0
+          ],
+          [
+            20000,
+            1200,
+            1250,
+            null,
+            null
+          ],
+          [
+            29556.1,
+            1400,
+            1450,
+            0,
+            0
+          ]
+      ]
+    }
+}
