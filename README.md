@@ -52,44 +52,25 @@ The changes that require it are listed below.
 
 ### Version history
 
-Entries marked **breaking** change the format of data that already existed, and
+Entries marked **Breaking** change the format of data that already existed, and
 require updating a parser written for the previous release. Everything else is
 additive: new optional fields, or new libraries a previous parser can ignore.
 
 #### v1.6
 
-- **breaking**: the track's `stops` field is renamed to `timing points` and
-  generalized. It lists the locations a journey may time itself against — the
-  places a train may start, finish or stop, and the intermediate locations
-  worth constraining a passing time at — rather than stopping places alone.
-  Names must be unique within a track, because journeys refer to timing points
-  by name.
-- **breaking**: each entry of `timing points` is now an object rather than a
-  bare position — `{"position": 0.0, "name": "Luzern"}` instead of `0.0`.
-  `name` and `coordinates` are optional per entry.
-- **breaking**: `timing points` uses a `units` dictionary instead of the single
-  `unit` key (`{"position": "m"}`, plus `"coordinates"` when entries carry
-  coordinates).
-- **breaking**: the track length moved to a new required `length` field. It is
+- **Breaking**: the track's `stops` field is renamed to `timing points`.
+- **Breaking**: each entry of `timing points` is now an object rather than a
+  bare position.
+- **Breaking**: `timing points` uses a `units` dictionary instead of the single
+  `unit` key (`{"position": "m"}`).
+- **Breaking**: the track length moved to a new required `length` field. It is
   no longer the position of the last entry of `stops`.
-- **breaking**: `timing points` became optional. A track without it has two
+- **Breaking**: `timing points` became optional. A track without it has two
   implicit, unnamed timing points, at 0 and at `length`. The rules that the
-  first entry be at position 0 and the last one equal the track length are gone
-  with the length job.
-- **breaking**: the optional `station names` list in `metadata`, introduced
-  between releases, is removed — the names live in `timing points` instead.
-- `00_reference` and `00_reference_with_tunnels` no longer declare `timing
-  points`.
-- **breaking**: a journey's `timing points` entries are objects rather than
-  five-element lists. Each carries a `type` — `"stopping"` or `"passing"`,
-  after the ERTMS/ATO Stopping Point / Passing Point — and locates itself
-  either by naming a timing point of the associated track or by an explicit
-  `position`, so a journey no longer restates positions the track already
-  records. A stopping point carries its `arrival` and `departure` windows in a
-  single entry, replacing the pair of entries at the same position, and a
-  passing point carries `time` and `speed` windows. Every constraint is a
-  `[lower, upper]` pair, replacing the four separate `lower`/`upper`
-  `time`/`speed constraint` columns and their four unit keys.
+  first entry be at position 0 and the last one equal the track length are gone.
+- `00_reference` and other basic tracks no longer declare `timing points`.
+- **Breaking**: a journey's `timing points` entries are objects rather than
+  five-element lists.
 
 #### v1.5
 
@@ -110,15 +91,15 @@ additive: new optional fields, or new libraries a previous parser can ignore.
 
 - Optional `curvatures` added to tracks, as triples of position, radius at
   start and radius at end, so that a section's curvature may vary linearly.
-- **breaking**: the track `00_stationX_stationY` was renamed to
+- **Breaking**: the track `00_stationX_stationY` was renamed to
   `CH_StGallen_Wil`; code referring to the old id has to be updated.
 
 #### v1.1
 
-- **breaking**: the top-level `id` moved into a new required `metadata` object,
+- **Breaking**: the top-level `id` moved into a new required `metadata` object,
   which also carries the required `library version` and the optional
   `created by` and `license`.
-- **breaking**: every field became a dictionary of units and values. `stops`
+- **Breaking**: every field became a dictionary of units and values. `stops`
   went from `[0.0, 8500.0, ...]` to `{"unit": "m", "values": [0.0, 8500.0, ...]}`,
   and `speed limits` and `gradients` gained a `units` dictionary alongside their
   `values`. Before this release no units were recorded anywhere.
@@ -126,7 +107,7 @@ additive: new optional fields, or new libraries a previous parser can ignore.
 
 #### v1.0
 
-Initial release: the track library only, as plain JSON.
+- Initial release: the track library only, as plain JSON.
 
 ## Citing this database
 
