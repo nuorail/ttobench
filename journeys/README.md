@@ -100,9 +100,14 @@ The following rules should be fulfilled by every journey file:
 - The first timing point has a `departure` and no `arrival`; the last has an
   `arrival` and no `departure`. They are the departure of the first journey
   section and the arrival of the last.
-- Every intermediate `stopping` point has both an `arrival` and a `departure`,
-  and neither departure bound may be earlier than the corresponding arrival
-  bound (no negative dwell time).
+- Every intermediate `stopping` point has both an `arrival` and a `departure`.
+- The constraints must admit a non-decreasing schedule. Reading `arrival`,
+  `departure` and `time` in journey order, the earliest time still reachable at
+  each one must fall inside its window. This covers the dwell at a stop and the
+  ordering between points alike: it rejects a journey that would have to reach a
+  later timing point before an earlier one, or leave a stop before arriving. It
+  is a check on the constraints only — whether a *train* can keep the schedule
+  depends on the train, and is not checked.
 - A `passing` point may be neither first nor last, and must not have both speed
   bounds set to zero — that describes a stop, which should say so with
   `"type": "stopping"`.

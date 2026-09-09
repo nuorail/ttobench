@@ -74,9 +74,8 @@ additive: new optional fields, or new libraries a previous parser can ignore.
 #### v1.5
 
 - Journey library introduced ([journeys/](journeys/README.md)), describing the
-  timing constraints of a run on a track, with `validate_journeys.py`.
+  timing constraints of a run on a track.
 - Optional `ETCS braking data` added to tracks and trains.
-- `validate_trains.py` added.
 
 #### v1.4
 
@@ -86,7 +85,6 @@ additive: new optional fields, or new libraries a previous parser can ignore.
 #### v1.3
 
 - Train library introduced ([trains/](trains/README.md)).
--  `utils/printTracks.py` and `utils/validateTracks.py` were renamed to `print_tracks.py` and `validate_tracks.py`.
 
 #### v1.2
 
@@ -105,7 +103,6 @@ additive: new optional fields, or new libraries a previous parser can ignore.
   and `speed limits` and `gradients` gained a `units` dictionary alongside their
   `values`. Before this release no units were recorded anywhere.
 - Optional `altitude` added to tracks.
-- `validateTracks.py` and `printTracks.py` added.
 
 #### v1.0
 

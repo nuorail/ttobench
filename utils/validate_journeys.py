@@ -271,6 +271,10 @@ class JourneyValidator():
 
         position = point['position']
 
+        if type(position) is str:
+
+            raise ValueError("Timing point {} gives a string as its 'position'! A timing point named after a location of the track uses the 'name' key: {{\"name\": \"{}\"}}.".format(index+1, position))
+
         if type(position) not in {float, int}:
 
             raise ValueError("Unexpected value type in 'position' of timing point {}! Expecting float or int, found {}.".format(index+1, type(position)))
@@ -367,6 +371,53 @@ class JourneyValidator():
 
                 raise ValueError("Positions in 'timing points' must be strictly increasing! Error at timing point {}.".format(ii+1))
 
+        self.validate_time_windows(values)
+
+
+    def validate_time_windows(self, values):
+        """Time must not run backwards along the journey.
+
+        Every constraint is a window rather than an instant, so the journey is
+        feasible in time exactly when some non-decreasing assignment exists
+        inside all of them. Propagating the earliest reachable time forward
+        decides that: the journey is infeasible as soon as that earliest time
+        passes a window's upper bound, and no later window can rescue it.
+
+        This subsumes the dwell time at a stop, which is just the arrival and
+        the departure windows of one timing point taken in order.
+        """
+
+        windows = []
+
+        for ii, point in enumerate(values):
+
+            keys = ('arrival', 'departure') if point['type'] == 'stopping' else ('time',)
+
+            for key in keys:
+
+                if key in point:
+
+                    windows.append((ii, key, point[key]))
+
+        earliest = 0.0
+        source = None
+
+        for index, key, (lower, upper) in windows:
+
+            if lower is not None and lower > earliest:
+
+                earliest, source = lower, (index, key)
+
+            if upper is not None and earliest > upper:
+
+                if source is not None and source[0] == index:
+
+                    raise ValueError("The {} window of timing point {} ends at {}, before its own {} can occur at {}! That is a negative dwell time.".format(
+                        key, index+1, upper, source[1], earliest))
+
+                raise ValueError("The {} window of timing point {} ends at {}, but the journey cannot reach it before {}, set by the {} of timing point {}! Time would have to run backwards.".format(
+                    key, index+1, upper, earliest, source[1], source[0]+1))
+
 
     def validate_stopping_point(self, point, index, is_first, is_last):
         """Arrival and departure of a stopping point.
@@ -400,14 +451,6 @@ class JourneyValidator():
                 if key not in point:
 
                     raise ValueError("Intermediate stopping point {} must have both an 'arrival' and a 'departure'! Missing: '{}'.".format(index+1, key))
-
-            for jj, label in enumerate(['lower', 'upper']):
-
-                arrival, departure = point['arrival'][jj], point['departure'][jj]
-
-                if arrival is not None and departure is not None and departure < arrival:
-
-                    raise ValueError("The {} departure bound of stopping point {} is earlier than its {} arrival bound, giving a negative dwell time!".format(label, index+1, label))
 
 
     def journey_sections(self):
