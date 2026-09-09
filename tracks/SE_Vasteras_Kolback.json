@@ -2,18 +2,30 @@
     "metadata": {
         "id": "SE_Vasteras_Kolback",
         "created by": "Dimitris Kouzoupis",
-        "library version": "TTOBench v1.1",
+        "library version": "TTOBench v1.6",
         "license": "BSD 2-Clause License"
+    },
+    "length": {
+        "unit": "m",
+        "value": 19305.4
     },
     "altitude": {
         "unit": "m",
         "value": 8.0
     },
-    "stops": {
-        "unit": "m",
+    "timing points": {
+        "units": {
+            "position": "m"
+        },
         "values": [
-            0.0,
-            19305.4
+            {
+                "position": 0.0,
+                "name": "Västerås"
+            },
+            {
+                "position": 19305.4,
+                "name": "Kolbäck"
+            }
         ]
     },
     "speed limits": {

@@ -1,6 +1,14 @@
 import os
 import json
 
+# A journey may place a timing point at an explicit position instead of naming
+# one of the track's. That escape hatch is not meant to restate a position the
+# track already records, so an explicit position that lands exactly on a named
+# timing point of the track is rejected. The tolerance only absorbs the unit
+# conversion; it is deliberately far smaller than any real spacing between a
+# station and a nearby benchmark waypoint.
+POSITION_TOLERANCE = 1e-6  # m
+
 
 class JourneyValidator():
 
@@ -14,7 +22,13 @@ class JourneyValidator():
 
         self.optional_metadata = {'description', 'created by', 'license'}
 
+        self.point_types = {'stopping', 'passing'}
+
+        self.bound_keys = {'stopping': ('arrival', 'departure'), 'passing': ('time', 'speed')}
+
         self.journey_data = None
+
+        self.track_data = None
 
 
     def validate_journey(self, filename, tracks_dir="../tracks"):
@@ -25,9 +39,9 @@ class JourneyValidator():
 
         self.validate_metadata()
 
-        self.validate_timing_points()
+        self.load_associated_track(tracks_dir)
 
-        self.validate_associated_track(tracks_dir)
+        self.validate_timing_points()
 
 
     def load_json(self, filename):
@@ -109,7 +123,7 @@ class JourneyValidator():
         return value
 
 
-    def validate_associated_track(self, tracks_dir):
+    def load_associated_track(self, tracks_dir):
 
         metadata = self.journey_data['metadata']
 
@@ -130,47 +144,47 @@ class JourneyValidator():
 
             with open(track_filename) as file:
 
-                track_data = json.load(file)
+                self.track_data = json.load(file)
 
         except FileNotFoundError:
 
             raise FileNotFoundError("Associated track file not found: {}!".format(track_id))
 
-        arrival_position = self.journey_data['timing points']['values'][-1][0]
-        departure_unit = self.journey_data['timing points']['units']['position']
 
-        track_length = track_data['stops']['values'][-1]
-        track_length_unit = track_data['stops']['unit']
+    def track_length(self):
+        "Length of the associated track in meters."
 
-        arrival_position = self.to_meter(arrival_position, departure_unit)
-        track_length = self.to_meter(track_length, track_length_unit)
+        length = self.track_data['length']
 
-        if arrival_position > track_length:
-            raise ValueError("Arrival position must be smaller than or equal to the track length!")
+        return self.to_meter(length['value'], length['unit'])
 
 
-    def is_stopping_point(self, timing_point):
+    def track_timing_points(self):
+        """The timing points of the associated track, positions in meters.
 
-        return timing_point[3] == 0 and timing_point[4] == 0
+        'timing points' is optional in a track: when it is absent the track has
+        two implicit, unnamed timing points, at 0 and at its length.
+        """
 
-    def get_journey_section_bounds(self, values):
+        if 'timing points' not in self.track_data:
 
-        departures = [0]
-        arrivals = []
+            return [{'position': 0.0}, {'position': self.track_length()}]
 
-        for ii in range(1, len(values)):
+        timing_points = self.track_data['timing points']
+        unit = timing_points['units']['position']
 
-            if values[ii][0] == values[ii-1][0]:
+        points = []
 
-                arrivals.append(ii-1)
-                departures.append(ii)
+        for point in timing_points['values']:
 
-        arrivals.append(len(values)-1)
+            converted = dict(point)
+            converted['position'] = self.to_meter(point['position'], unit)
+            points.append(converted)
 
-        return list(zip(departures, arrivals))
+        return points
 
 
-    def validate_timing_points(self):
+    def validate_units(self):
 
         timing_points = self.journey_data['timing points']
 
@@ -180,133 +194,237 @@ class JourneyValidator():
 
             raise ValueError("Unexpected keys in 'timing points'! Expecting 'units' and 'values'.")
 
-        fields_units = {
-            'position',
-            'lower time constraint',
-            'upper time constraint',
-            'lower speed constraint',
-            'upper speed constraint'
-        }
+        units = timing_points['units']
 
-        if fields_units != timing_points['units'].keys():
+        fields_units = {'position', 'time', 'speed'}
 
-            raise ValueError("Unexpected keys in units of 'timing points'!")
+        if fields_units != units.keys():
 
-        if timing_points['units']['position'] not in {'m', 'km'}:
+            raise ValueError("Unexpected keys in units of 'timing points'! Expecting 'position', 'time' and 'speed'.")
+
+        if units['position'] not in {'m', 'km'}:
 
             raise ValueError("Unexpected unit in position of 'timing points'! Expecting 'm' or 'km'.")
 
-        if timing_points['units']['lower time constraint'] not in {'s'} or timing_points['units']['upper time constraint'] not in {'s'}:
+        if units['time'] not in {'s'}:
 
-            raise ValueError("Unexpected unit in time constraints of 'timing points'! Expecting 's'.")
+            raise ValueError("Unexpected unit in time of 'timing points'! Expecting 's'.")
 
-        if timing_points['units']['lower speed constraint'] not in {'km/h', 'm/s'} or timing_points['units']['upper speed constraint'] not in {'km/h', 'm/s'}:
+        if units['speed'] not in {'km/h', 'm/s'}:
 
-            raise ValueError("Unexpected unit in speed constraints of 'timing points'! Expecting 'km/h' or 'm/s'.")
+            raise ValueError("Unexpected unit in speed of 'timing points'! Expecting 'km/h' or 'm/s'.")
 
-        values = timing_points['values']
+
+    def validate_bounds(self, key, bounds, index):
+        "Check one [lower, upper] constraint pair. Either bound may be null."
+
+        if type(bounds) is not list or len(bounds) != 2:
+
+            raise ValueError("Unexpected value for '{}' in timing point {}! Expecting a list of two entries, [lower, upper].".format(key, index+1))
+
+        lower, upper = bounds
+
+        for bound, label in zip(bounds, ['lower', 'upper']):
+
+            if bound is not None and type(bound) not in {float, int}:
+
+                raise ValueError("Unexpected value type in {} bound of '{}' in timing point {}! Expecting float, int or None, found {}.".format(label, key, index+1, type(bound)))
+
+            if bound is not None and bound < 0:
+
+                raise ValueError("Bounds of '{}' in timing point {} must be positive or None!".format(key, index+1))
+
+        if lower is not None and upper is not None and lower > upper:
+
+            raise ValueError("Lower bound of '{}' must be smaller than or equal to its upper bound! Error at timing point {}.".format(key, index+1))
+
+
+    def resolve_position(self, point, index, track_points):
+        """The position of one journey timing point, in meters.
+
+        A timing point locates itself either by naming a timing point of the
+        associated track, or by carrying an explicit position of its own.
+        """
+
+        has_name = 'name' in point
+        has_position = 'position' in point
+
+        if has_name == has_position:
+
+            raise ValueError("Timing point {} must have exactly one of 'name' and 'position'!".format(index+1))
+
+        if has_name:
+
+            name = point['name']
+
+            if type(name) is not str:
+
+                raise ValueError("Unexpected value type in 'name' of timing point {}! Expecting str, found {}.".format(index+1, type(name)))
+
+            for track_point in track_points:
+
+                if track_point.get('name') == name:
+
+                    return track_point['position']
+
+            known = ", ".join(sorted(repr(p['name']) for p in track_points if 'name' in p))
+
+            raise ValueError("Timing point {} refers to '{}', which is not a named timing point of track '{}'! Known names: {}.".format(
+                index+1, name, self.journey_data['metadata']['associated track'], known if known else "none"))
+
+        position = point['position']
+
+        if type(position) not in {float, int}:
+
+            raise ValueError("Unexpected value type in 'position' of timing point {}! Expecting float or int, found {}.".format(index+1, type(position)))
+
+        if position < 0:
+
+            raise ValueError("Position of timing point {} must be positive!".format(index+1))
+
+        position = self.to_meter(position, self.journey_data['timing points']['units']['position'])
+
+        if position > self.track_length():
+
+            raise ValueError("Position of timing point {} must be smaller than or equal to the track length!".format(index+1))
+
+        for track_point in track_points:
+
+            if 'name' in track_point and abs(track_point['position'] - position) <= POSITION_TOLERANCE:
+
+                raise ValueError("Timing point {} gives an explicit position that is the position of '{}' on track '{}'! Refer to it by name instead of restating where it is.".format(
+                    index+1, track_point['name'], self.journey_data['metadata']['associated track']))
+
+        return position
+
+
+    def validate_timing_points(self):
+
+        self.validate_units()
+
+        values = self.journey_data['timing points']['values']
+
+        if type(values) is not list:
+
+            raise ValueError("Unexpected type for values of 'timing points'! Expecting a list, found {}.".format(type(values)))
 
         if len(values) < 2:
 
             raise ValueError("'timing points' must contain at least two entries!")
 
-        for ii, v in enumerate(values):
+        track_points = self.track_timing_points()
 
-            if len(v) != 5:
-                raise ValueError(
-                    "Unexpected size of nested list in 'timing points'! Expecting 5, got {}.".format(len(v)))
+        positions = []
 
-            pos, t_min, t_max, v_min, v_max = v
+        for ii, point in enumerate(values):
 
-            if type(pos) not in {float, int}:
+            if type(point) is not dict:
 
-                raise ValueError("Unexpected value type in position of 'timing points'! Expecting float or int, found {}.".format(type(pos)))
+                raise ValueError("Unexpected entry type in 'timing points'! Expecting a dictionary, found {}.".format(type(point)))
 
-            if pos < 0:
+            if 'type' not in point:
 
-                raise ValueError("Position of 'timing points' must be positive!")
+                raise ValueError("Missing 'type' in timing point {}! Expecting one of {}.".format(ii+1, ", ".join(sorted(repr(t) for t in self.point_types))))
 
-            if ii > 0 and pos < values[ii-1][0]:
+            point_type = point['type']
 
-                raise ValueError("Positions in 'timing points' must be non-decreasing! Error at point {}.".format(ii+1))
+            if point_type not in self.point_types:
 
-            if ii > 0 and pos == values[ii - 1][0]:
+                raise ValueError("Unknown 'type' in timing point {}: {}! Expecting one of {}.".format(ii+1, repr(point_type), ", ".join(sorted(repr(t) for t in self.point_types))))
 
-                if ii == 1 or ii == len(values) - 1:
+            first_bound, second_bound = self.bound_keys[point_type]
 
-                    raise ValueError("Equal positions are only allowed for intermediate arrival/departure pairs! Error at point {}.".format(ii + 1))
+            unknown_keys = set(point) - {'type', 'name', 'position', first_bound, second_bound}
 
-                if not self.is_stopping_point(v) or not self.is_stopping_point(values[ii - 1]):
+            if unknown_keys:
 
-                    raise ValueError("Equal positions are only allowed for consecutive stopping points! Error at point {}.".format(ii + 1))
+                raise ValueError("Unknown key(s) in timing point {}: {}! A '{}' timing point takes 'type', 'name' or 'position', '{}' and '{}'.".format(
+                    ii+1, ", ".join(sorted(unknown_keys)), point_type, first_bound, second_bound))
 
-                if ii > 1 and pos == values[ii - 2][0]:
+            positions.append(self.resolve_position(point, ii, track_points))
 
-                    raise ValueError("More than two consecutive timing points at the same position are not allowed! Error at point {}.".format(ii + 1))
+            for key in (first_bound, second_bound):
 
-            for key, value in zip(
-                    ['lower time constraint', 'upper time constraint', 'lower speed constraint',
-                     'upper speed constraint'],
-                    [t_min, t_max, v_min, v_max]
-            ):
+                if key in point:
 
-                if value is not None and type(value) not in {float, int}:
+                    self.validate_bounds(key, point[key], ii)
 
-                    raise ValueError("Unexpected value type in '{}' of 'timing points'! Expecting float, int or None, found {}.".format(key, type(value)))
+            is_first = ii == 0
+            is_last = ii == len(values) - 1
 
-                if value is not None and value < 0:
+            if point_type == 'stopping':
 
-                    raise ValueError("'{}' of 'timing points' must be positive or None!".format(key))
+                self.validate_stopping_point(point, ii, is_first, is_last)
 
-            if t_min is not None and t_max is not None and t_min > t_max:
+            else:
 
-                raise ValueError("Lower time constraint must be smaller than or equal to upper time constraint! Error at point {}.".format(ii+1))
+                if is_first or is_last:
 
-            if v_min is not None and v_max is not None and v_min > v_max:
+                    raise ValueError("The first and last timing point must be of type 'stopping'! Error at timing point {}.".format(ii+1))
 
-                raise ValueError("Lower speed constraint must be smaller than or equal to upper speed constraint! Error at point {}.".format(ii+1))
+                if point.get('speed') == [0, 0]:
 
-            if ii == 0 or ii == len(values)-1:
+                    raise ValueError("A 'passing' timing point must not have both speed bounds set to zero! Use type 'stopping' instead. Error at timing point {}.".format(ii+1))
 
-                if v_min != 0 or v_max != 0:
+            if ii > 0 and positions[ii] <= positions[ii-1]:
 
-                    raise ValueError("First and last timing point must have both speed constraints set to zero!")
+                raise ValueError("Positions in 'timing points' must be strictly increasing! Error at timing point {}.".format(ii+1))
 
-        for ii, v in enumerate(values):
 
-            if ii == 0 or ii == len(values) - 1:
+    def validate_stopping_point(self, point, index, is_first, is_last):
+        """Arrival and departure of a stopping point.
 
-                continue
+        The first timing point of a journey is only departed from and the last
+        one is only arrived at; every stopping point in between both ends the
+        journey section that reaches it and begins the next one, so it carries
+        an arrival and a departure whose difference is the dwell time.
+        """
 
-            if self.is_stopping_point(v):
+        if is_first and 'arrival' in point:
 
-                pos = v[0]
+            raise ValueError("The first timing point is a departure and must not have an 'arrival'!")
 
-                if pos != values[ii - 1][0] and pos != values[ii + 1][0]:
+        if is_first and 'departure' not in point:
 
-                    raise ValueError("Intermediate stopping points must be part of an arrival/departure pair! Error at point {}.".format(ii + 1))
+            raise ValueError("The first timing point must have a 'departure'!")
 
-        journey_section_bounds = self.get_journey_section_bounds(values)
+        if is_last and 'departure' in point:
 
-        if len(journey_section_bounds) < 1:
+            raise ValueError("The last timing point is an arrival and must not have a 'departure'!")
 
-            raise ValueError("Journey must contain at least one journey section!")
+        if is_last and 'arrival' not in point:
 
-        for ii, bounds in enumerate(journey_section_bounds):
+            raise ValueError("The last timing point must have an 'arrival'!")
 
-            departure_idx, arrival_idx = bounds
+        if not is_first and not is_last:
 
-            if departure_idx >= arrival_idx:
+            for key in ('arrival', 'departure'):
 
-                raise ValueError("Invalid journey section {}!".format(ii))
+                if key not in point:
 
-            if not self.is_stopping_point(values[departure_idx]) or not self.is_stopping_point(values[arrival_idx]):
+                    raise ValueError("Intermediate stopping point {} must have both an 'arrival' and a 'departure'! Missing: '{}'.".format(index+1, key))
 
-                raise ValueError("Journey section {} must start and end with a stopping point!".format(ii))
+            for jj, label in enumerate(['lower', 'upper']):
 
-            if values[departure_idx][0] >= values[arrival_idx][0]:
+                arrival, departure = point['arrival'][jj], point['departure'][jj]
 
-                raise ValueError("Journey section {} must have increasing position!".format(ii))
+                if arrival is not None and departure is not None and departure < arrival:
+
+                    raise ValueError("The {} departure bound of stopping point {} is earlier than its {} arrival bound, giving a negative dwell time!".format(label, index+1, label))
+
+
+    def journey_sections(self):
+        """Index pairs (departure, arrival) delimiting the journey sections.
+
+        A journey section is the part of a journey between two consecutive
+        stopping points.
+        """
+
+        values = self.journey_data['timing points']['values']
+
+        stopping = [ii for ii, point in enumerate(values) if point['type'] == 'stopping']
+
+        return list(zip(stopping[:-1], stopping[1:]))
 
 
 if __name__ == '__main__':

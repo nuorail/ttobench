@@ -2,30 +2,78 @@
     "metadata": {
         "id": "CN_Songjiazhuang_Yizhuang",
         "created by": "Dimitris Kouzoupis",
-        "library version": "TTOBench v1.1",
+        "library version": "TTOBench v1.6",
         "license": "BSD 2-Clause License"
+    },
+    "length": {
+        "unit": "m",
+        "value": 22728.0
     },
     "altitude": {
         "unit": "m",
         "value": 0
     },
-    "stops": {
-        "unit": "m",
+    "timing points": {
+        "units": {
+            "position": "m"
+        },
         "values": [
-            0.0,
-            2631.0,
-            3906.0,
-            6272.0,
-            8254.0,
-            9274.0,
-            10785.0,
-            12065.0,
-            13419.0,
-            15757.0,
-            18022.0,
-            20108.0,
-            21394.0,
-            22728.0
+            {
+                "position": 0.0,
+                "name": "Songjiazhuang"
+            },
+            {
+                "position": 2631.0,
+                "name": "Xiaocun"
+            },
+            {
+                "position": 3906.0,
+                "name": "Xiaohongmen"
+            },
+            {
+                "position": 6272.0,
+                "name": "Jiugong"
+            },
+            {
+                "position": 8254.0,
+                "name": "Yizhuangqiao"
+            },
+            {
+                "position": 9274.0,
+                "name": "Wenhuayuan"
+            },
+            {
+                "position": 10785.0,
+                "name": "Wanyuan"
+            },
+            {
+                "position": 12065.0,
+                "name": "Rongjing"
+            },
+            {
+                "position": 13419.0,
+                "name": "Rongchang"
+            },
+            {
+                "position": 15757.0,
+                "name": "Tongjinan"
+            },
+            {
+                "position": 18022.0,
+                "name": "Jinghai"
+            },
+            {
+                "position": 20108.0,
+                "name": "Ciqunan"
+            },
+            {
+                "position": 21394.0,
+                "name": "Ciqu"
+            },
+            {
+                "position": 22728.0,
+                "name": "Yizhuang"
+            }
         ]
     },
     "speed limits": {

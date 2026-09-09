@@ -2,18 +2,30 @@
     "metadata": {
         "id": "CH_StGallen_Wil",
         "created by": "Dimitris Kouzoupis, Juxhino Kavaja",
-        "library version": "TTOBench v1.2",
+        "library version": "TTOBench v1.6",
         "license": "BSD 2-Clause License"
+    },
+    "length": {
+        "unit": "m",
+        "value": 29556.1
     },
     "altitude": {
         "unit": "m",
         "value": 675.2
     },
-    "stops": {
-        "unit": "m",
+    "timing points": {
+        "units": {
+            "position": "m"
+        },
         "values": [
-            0.0,
-            29556.1
+            {
+                "position": 0.0,
+                "name": "St. Gallen"
+            },
+            {
+                "position": 29556.1,
+                "name": "Wil SG"
+            }
         ]
     },
     "speed limits": {
@@ -1896,13 +1908,13 @@
         ]
     },
     "ETCS braking data": {
-          "M_NVAVADH": {
-              "unit": "-",
-              "value": 0
-          },
-          "Kt_int": {
-              "unit": "-",
-              "value": 1.15
-          }
+        "M_NVAVADH": {
+            "unit": "-",
+            "value": 0
+        },
+        "Kt_int": {
+            "unit": "-",
+            "value": 1.15
+        }
     }
 }

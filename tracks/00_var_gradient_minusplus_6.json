@@ -2,19 +2,16 @@
     "metadata": {
         "id": "00_var_gradient_minusplus_6",
         "created by": "Dimitris Kouzoupis",
-        "library version": "TTOBench v1.1",
+        "library version": "TTOBench v1.6",
         "license": "BSD 2-Clause License"
+    },
+    "length": {
+        "unit": "m",
+        "value": 48531.0
     },
     "altitude": {
         "unit": "m",
         "value": 0
-    },
-    "stops": {
-        "unit": "m",
-        "values": [
-            0.0,
-            48531.0
-        ]
     },
     "speed limits": {
         "units": {

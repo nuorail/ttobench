@@ -19,7 +19,7 @@ def print_tracks(tracks_dir, filename=None):
         'Min interval [m]',
         'Max interval [m]',
         'Num intervals [-]',
-        'Num stops [-]',
+        'Num timing points [-]',
         'Num tunnel sections [-]',
         'Min tunnel length [m]',
         'Max tunnel length [m]'
@@ -35,8 +35,9 @@ def print_tracks(tracks_dir, filename=None):
 
             id, _ = os.path.splitext(file)
 
-            length = data['stops']['values'][-1]
-            num_stops = len(data['stops']['values'])
+            length = data['length']['value']*(1e3 if data['length']['unit'] == 'km' else 1)  # m
+            # 'timing points' is optional; when absent the track has two implicit ones, 0 and its length
+            num_timing_points = len(data['timing points']['values']) if 'timing points' in data else 2
 
             speed_limit_values = [v[1]*(3.6 if data['speed limits']['units']['velocity'] == 'm/s' else 1) for v in data['speed limits']['values']]  # km/h
             speed_limit_positions = [v[0]*(1e3 if data['speed limits']['units']['position'] == 'km' else 1) for v in data['speed limits']['values']]  # m
@@ -82,7 +83,7 @@ def print_tracks(tracks_dir, filename=None):
                 float(round(min(intervals), 1)),
                 float(round(max(intervals), 1)),
                 len(intervals),
-                num_stops,
+                num_timing_points,
                 len(tunnel_lengths) if tunnel_lengths is not None else 0,
                 min(tunnel_lengths) if tunnel_lengths is not None else 0,
                 max(tunnel_lengths) if tunnel_lengths is not None else 0

@@ -8,9 +8,9 @@ class TrackValidator():
 
     def __init__(self):
 
-        self.required_fields = {'metadata', 'stops', 'speed limits'}
+        self.required_fields = {'metadata', 'length', 'speed limits'}
 
-        self.optional_fields = {'altitude', 'gradients', 'curvatures', 'tunnels', 'ETCS braking data'}
+        self.optional_fields = {'altitude', 'timing points', 'gradients', 'curvatures', 'tunnels', 'ETCS braking data'}
 
         self.required_metadata = {'id', 'library version'}
 
@@ -29,7 +29,9 @@ class TrackValidator():
 
         self.validate_altitude()
 
-        self.validate_stops()
+        self.validate_length()
+
+        self.validate_timing_points()
 
         self.validate_speed_limits()
 
@@ -138,39 +140,133 @@ class TrackValidator():
                 raise ValueError("'altitude' must be positive!")
 
 
-    def validate_stops(self):
+    def to_meter(self, value, unit):
 
-        stops = self.track_data['stops']
+        return value*1e3 if unit == 'km' else value
 
-        fields = {'unit', 'values'}
 
-        if fields != stops.keys():
+    def track_length(self):
+        "Length of the track in meters."
 
-            raise ValueError("Unexpected keys in 'stops'! Expecting 'unit' and 'values'.")
+        length = self.track_data['length']
 
-        if stops['unit'] not in {'m', 'km'}:
+        return self.to_meter(length['value'], length['unit'])
 
-            raise ValueError("Unexpected unit in 'stops'! Expecting 'm' or 'km'.")
 
-        for ii, v in enumerate(stops['values']):
+    def validate_length(self):
 
-            if type(v) not in {float, int}:
+        self.validate_parameter_dict('length', self.track_data['length'], {'m', 'km'})
 
-                raise ValueError("Unexpected value type in 'stops'! Expecting float or int, found {}.".format(type(v)))
 
-            if v < 0:
+    def validate_timing_points(self):
 
-                raise ValueError("Values in 'stops' must be positive!")
+        if not 'timing points' in self.track_data:
 
-            if ii == 0:
+            return
 
-                if v != 0:
+        timing_points = self.track_data['timing points']
 
-                    raise ValueError("First value in 'stops' must be equal to zero!")
+        fields = {'units', 'values'}
 
-            if ii > 0 and v <= stops['values'][ii-1]:
+        if fields != timing_points.keys():
 
-                raise ValueError("Values in 'stops' must be strictly increasing!")
+            raise ValueError("Unexpected keys in 'timing points'! Expecting 'units' and 'values'.")
+
+        units = timing_points['units']
+
+        if 'position' not in units:
+
+            raise ValueError("Missing 'position' in units of 'timing points'!")
+
+        unknown_units = set(units) - {'position', 'coordinates'}
+
+        if unknown_units:
+
+            raise ValueError("Unexpected keys in units of 'timing points': {}! Expecting 'position' and optionally 'coordinates'.".format(", ".join(sorted(unknown_units))))
+
+        if units['position'] not in {'m', 'km'}:
+
+            raise ValueError("Unexpected unit in position of 'timing points'! Expecting 'm' or 'km'.")
+
+        if 'coordinates' in units and units['coordinates'] not in {'deg'}:
+
+            raise ValueError("Unexpected unit in coordinates of 'timing points'! Expecting 'deg'.")
+
+        names = {}
+
+        for ii, point in enumerate(timing_points['values']):
+
+            if type(point) is not dict:
+
+                raise ValueError("Unexpected entry type in 'timing points'! Expecting a dictionary, found {}.".format(type(point)))
+
+            unknown_keys = set(point) - {'position', 'name', 'coordinates'}
+
+            if unknown_keys:
+
+                raise ValueError("Unknown key(s) in timing point {} of 'timing points': {}! Expecting 'position', 'name' and 'coordinates'.".format(ii+1, ", ".join(sorted(unknown_keys))))
+
+            if 'position' not in point:
+
+                raise ValueError("Missing 'position' in timing point {} of 'timing points'!".format(ii+1))
+
+            pos = point['position']
+
+            if type(pos) not in {float, int}:
+
+                raise ValueError("Unexpected value type in position of 'timing points'! Expecting float or int, found {}.".format(type(pos)))
+
+            if pos < 0:
+
+                raise ValueError("Positions in 'timing points' must be positive!")
+
+            if self.to_meter(pos, units['position']) > self.track_length():
+
+                raise ValueError("Positions in 'timing points' must not exceed the track length!")
+
+            if ii > 0 and pos <= timing_points['values'][ii-1]['position']:
+
+                raise ValueError("Positions in 'timing points' must be strictly increasing!")
+
+            if 'name' in point:
+
+                name = point['name']
+
+                if type(name) is not str:
+
+                    raise ValueError("Unexpected type for 'name' in timing point {} of 'timing points'! Expecting str, found {}. Omit the key for timing points without a name.".format(ii+1, type(name)))
+
+                if name in names:
+
+                    raise ValueError("Duplicate name '{}' in timing points {} and {} of 'timing points'! Journeys reference timing points by name, so names must be unique within a track.".format(name, names[name]+1, ii+1))
+
+                names[name] = ii
+
+            if 'coordinates' in point:
+
+                if 'coordinates' not in units:
+
+                    raise ValueError("Timing point {} of 'timing points' has 'coordinates' but no coordinates unit is declared in its units!".format(ii+1))
+
+                coordinates = point['coordinates']
+
+                if type(coordinates) is not list or len(coordinates) != 2:
+
+                    raise ValueError("Unexpected value for 'coordinates' in timing point {} of 'timing points'! Expecting a list of two numbers, [longitude, latitude].".format(ii+1))
+
+                longitude, latitude = coordinates
+
+                if type(longitude) not in {float, int} or type(latitude) not in {float, int}:
+
+                    raise ValueError("Unexpected value type in 'coordinates' of timing point {} of 'timing points'! Expecting float or int.".format(ii+1))
+
+                if not -180 <= longitude <= 180:
+
+                    raise ValueError("Longitude in 'coordinates' of timing point {} of 'timing points' must be within [-180, 180], found {}.".format(ii+1, longitude))
+
+                if not -90 <= latitude <= 90:
+
+                    raise ValueError("Latitude in 'coordinates' of timing point {} of 'timing points' must be within [-90, 90], found {}.".format(ii+1, latitude))
 
 
     def validate_speed_limits(self):
@@ -225,7 +321,7 @@ class TrackValidator():
 
             if len(speed_limits['values']) > 1 and ii == len(speed_limits['values'])-1:
 
-                if pos == self.track_data['stops']['values'][-1]:
+                if self.to_meter(pos, speed_limits['units']['position']) == self.track_length():
 
                     raise ValueError("Last position of 'speed limits' must be smaller than the track length!")
 
@@ -290,7 +386,7 @@ class TrackValidator():
 
             if len(gradients['values']) > 1 and ii == len(gradients['values'])-1:
 
-                if pos == self.track_data['stops']['values'][-1]:
+                if self.to_meter(pos, gradients['units']['position']) == self.track_length():
 
                     raise ValueError("Last position of 'gradients' must be smaller than the track length!")
 
@@ -371,7 +467,7 @@ class TrackValidator():
 
             if len(curvatures['values']) > 1 and ii == len(curvatures['values'])-1:
 
-                if pos == self.track_data['stops']['values'][-1]:
+                if self.to_meter(pos, curvatures['units']['position']) == self.track_length():
 
                     raise ValueError("Last position of 'curvatures' must be smaller than the track length!")
 
@@ -436,7 +532,9 @@ class TrackValidator():
 
                 raise ValueError("Unexpected value for 'length' in 'tunnels'! Expecting a finite positive number, got '{}' at position {}.".format(v[1], ii))
 
-            if pos + length > self.track_data['stops']['values'][-1]:
+            tunnel_end = self.to_meter(pos, tunnels['units']['position']) + self.to_meter(length, tunnels['units']['length'])
+
+            if tunnel_end > self.track_length():
 
                 raise ValueError("End of tunnel must be smaller than the track length!")
 
@@ -458,7 +556,7 @@ class TrackValidator():
 
             if len(tunnels['values']) > 1 and ii == len(tunnels['values'])-1:
 
-                if pos == self.track_data['stops']['values'][-1]:
+                if self.to_meter(pos, tunnels['units']['position']) == self.track_length():
 
                     raise ValueError("Last position of 'tunnels' must be smaller than the track length!")
 
@@ -468,6 +566,10 @@ class TrackValidator():
 
 
     def validate_parameter_dict(self, key, parameter, units, strictly_positive=True, integer=False, upper_bound=None):
+
+        if type(parameter) is not dict:
+
+            raise ValueError("Unexpected type for '{}'! Expecting a dictionary with 'unit' and 'value', found {}.".format(key, type(parameter)))
 
         fields = {'unit', 'value'}
 
