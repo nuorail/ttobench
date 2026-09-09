@@ -1,4 +1,4 @@
-# TTOBench v1.6
+# TTOBench v2.0
 Open-source library for train trajectory optimization
 
 [![Validate data](https://github.com/nuorail/ttobench/actions/workflows/validate.yml/badge.svg)](https://github.com/nuorail/ttobench/actions/workflows/validate.yml)
@@ -34,13 +34,24 @@ library.
 ## Versioning
 
 The library version (`vX.Y`, also recorded as `library version` in every JSON
-file and as a Git tag) identifies a **release snapshot** of the library, for
-citation and provenance. It is not a semantic-versioning compatibility
-contract: a new release may change the format of an existing field, and such
-changes have gone out in minor bumps before (`stops` changed shape in v1.1 and
-became `timing points` in v1.6). The `library version` recorded inside a file states the release
-whose format that file conforms to, so files written for different releases can
-coexist in the library.
+file and as a Git tag) identifies a release of the library, for citation and
+provenance.
+
+**The first digit changes when the format breaks**: a parser written for the
+previous major release will not read the files of the new one. A minor bump is
+additive — new optional fields, new instances, or a whole new library that an
+existing parser can ignore.
+
+This is not semantic versioning: there is no patch digit. The rule is a
+commitment for releases from v2.0 onwards, and it also describes the history
+before it, with a single exception — **v1.1**, which changed the shape of every
+track file in a minor bump and is the only past release that would take a major
+bump under it.
+
+The `library version` recorded inside a file states the release whose format
+that file conforms to, so files written for different releases coexist in the
+library — the four train files still read `v1.3` and `v1.4` because the train
+format has not changed since. It is the first digit that informs the user whether a previous parser applies.
 
 When updating to a new release, re-read the schema in:
 - [tracks/README.md](tracks/README.md)
@@ -56,7 +67,7 @@ Entries marked **Breaking** change the format of data that already existed, and
 require updating a parser written for the previous release. Everything else is
 additive: new optional fields, or new libraries a previous parser can ignore.
 
-#### v1.6
+#### v2.0
 
 - **Breaking**: the track's `stops` field is renamed to `timing points`.
 - **Breaking**: each entry of `timing points` is now an object rather than a
@@ -91,8 +102,8 @@ additive: new optional fields, or new libraries a previous parser can ignore.
 
 - Optional `curvatures` added to tracks, as triples of position, radius at
   start and radius at end, so that a section's curvature may vary linearly.
-- **Breaking**: the track `00_stationX_stationY` was renamed to
-  `CH_StGallen_Wil`; code referring to the old id has to be updated.
+- The track `00_stationX_stationY` was renamed to `CH_StGallen_Wil`; code
+  referring to the old id has to be updated.
 
 #### v1.1
 
