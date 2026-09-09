@@ -1,0 +1,25 @@
+name: Validate data
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # validate_all.py checks every track, train and journey, reports all the
+      # files that fail rather than stopping at the first, and exits non-zero
+      # if any did. It needs only the standard library, so there is nothing to
+      # install.
+      - name: Validate tracks, trains and journeys
+        run: python utils/validate_all.py

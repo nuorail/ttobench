@@ -93,7 +93,7 @@ osculating circle at that point. A positive radius indicates a right-hand turn w
 a negative radius a left-hand turn. If the radius at start is equal to the radius at end
 then the track section has constant curvature. For a straight track the two radii have value "infinity".
 Different values for radius at start and radius at end denote a track section where the
-curvature of the section varies linearly with the travelled distance (clothoid curve) to
+curvature of the section varies linearly with the traveled distance (clothoid curve) to
 interpolate between the two radii values. Note that the positions must be strictly
 increasing. The position of the first triple should be 0 and the position of the
 last triple must be smaller than the length of the track. The field can be omitted for straight tracks.

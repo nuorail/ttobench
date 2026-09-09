@@ -4,7 +4,7 @@
 file carrying two `altitude` fields parses without complaint and then validates
 without complaint — the reader sees one of the two values and no reader can
 tell which was intended. RFC 8259 says the names in an object SHOULD be unique
-and that behaviour is unpredictable when they are not, so the library treats a
+and that behavior is unpredictable when they are not, so the library treats a
 repeated key as a broken file rather than picking a winner.
 
 The check runs on every object at every depth, so it also catches a repeated

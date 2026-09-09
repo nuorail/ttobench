@@ -1,6 +1,8 @@
 # TTOBench v1.6
 Open-source library for train trajectory optimization
 
+[![Validate data](https://github.com/nuorail/ttobench/actions/workflows/validate.yml/badge.svg)](https://github.com/nuorail/ttobench/actions/workflows/validate.yml)
+
 ## Content
 
 - [Track library with benchmark instances in JSON format](tracks/README.md)
@@ -10,6 +12,24 @@ Open-source library for train trajectory optimization
 - [Journey library with benchmark instances in JSON format](journeys/README.md)
 
 - [Python utils](utils/)
+
+## Validation
+
+Every track, train and journey in the library is checked against the schema
+documented in the READMEs above. The checks run in CI on every push and pull
+request ([validate.yml](.github/workflows/validate.yml)), and can be run
+locally with:
+
+```
+python utils/validate_all.py
+```
+
+This reports every file that fails rather than stopping at the first, and exits
+non-zero if any did. The individual validators behind it
+(`validate_tracks.py`, `validate_trains.py`, `validate_journeys.py`) can also be
+run on their own, but resolve their paths relative to the working directory and
+so must be started from inside `utils`. They all need only the standard
+library.
 
 ## Versioning
 
@@ -39,7 +59,7 @@ additive: new optional fields, or new libraries a previous parser can ignore.
 #### v1.6
 
 - **breaking**: the track's `stops` field is renamed to `timing points` and
-  generalised. It lists the locations a journey may time itself against — the
+  generalized. It lists the locations a journey may time itself against — the
   places a train may start, finish or stop, and the intermediate locations
   worth constraining a passing time at — rather than stopping places alone.
   Names must be unique within a track, because journeys refer to timing points
