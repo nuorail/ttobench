@@ -1,7 +1,7 @@
 import math
 import os
 
-import json
+import json_strict
 
 
 class TrackValidator():
@@ -48,9 +48,7 @@ class TrackValidator():
 
         try:
 
-            with open(filename) as file:
-
-                data = json.load(file)
+            data = json_strict.load(filename)
 
         except FileNotFoundError:
 
@@ -321,7 +319,7 @@ class TrackValidator():
 
             if len(speed_limits['values']) > 1 and ii == len(speed_limits['values'])-1:
 
-                if self.to_meter(pos, speed_limits['units']['position']) == self.track_length():
+                if self.to_meter(pos, speed_limits['units']['position']) >= self.track_length():
 
                     raise ValueError("Last position of 'speed limits' must be smaller than the track length!")
 
@@ -386,7 +384,7 @@ class TrackValidator():
 
             if len(gradients['values']) > 1 and ii == len(gradients['values'])-1:
 
-                if self.to_meter(pos, gradients['units']['position']) == self.track_length():
+                if self.to_meter(pos, gradients['units']['position']) >= self.track_length():
 
                     raise ValueError("Last position of 'gradients' must be smaller than the track length!")
 
@@ -467,7 +465,7 @@ class TrackValidator():
 
             if len(curvatures['values']) > 1 and ii == len(curvatures['values'])-1:
 
-                if self.to_meter(pos, curvatures['units']['position']) == self.track_length():
+                if self.to_meter(pos, curvatures['units']['position']) >= self.track_length():
 
                     raise ValueError("Last position of 'curvatures' must be smaller than the track length!")
 
@@ -556,7 +554,7 @@ class TrackValidator():
 
             if len(tunnels['values']) > 1 and ii == len(tunnels['values'])-1:
 
-                if self.to_meter(pos, tunnels['units']['position']) == self.track_length():
+                if self.to_meter(pos, tunnels['units']['position']) >= self.track_length():
 
                     raise ValueError("Last position of 'tunnels' must be smaller than the track length!")
 

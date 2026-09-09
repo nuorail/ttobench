@@ -1,5 +1,6 @@
 import os
-import json
+
+import json_strict
 
 # A journey may place a timing point at an explicit position instead of naming
 # one of the track's. That escape hatch is not meant to restate a position the
@@ -48,9 +49,7 @@ class JourneyValidator():
 
         try:
 
-            with open(filename) as file:
-
-                data = json.load(file)
+            data = json_strict.load(filename)
 
         except FileNotFoundError:
 
@@ -142,9 +141,7 @@ class JourneyValidator():
 
         try:
 
-            with open(track_filename) as file:
-
-                self.track_data = json.load(file)
+            self.track_data = json_strict.load(track_filename)
 
         except FileNotFoundError:
 

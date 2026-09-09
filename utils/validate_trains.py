@@ -1,7 +1,7 @@
 import math
 import os
 
-import json
+import json_strict
 
 
 class TrainValidator():
@@ -63,9 +63,7 @@ class TrainValidator():
 
         try:
 
-            with open(filename) as file:
-
-                data = json.load(file)
+            data = json_strict.load(filename)
 
         except FileNotFoundError:
 
